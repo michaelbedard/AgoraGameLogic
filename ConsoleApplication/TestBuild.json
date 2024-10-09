@@ -1,0 +1,145 @@
+{
+  "Id" : 0,
+  "Name" : "Test",
+  "Structures" : [
+    {
+      "Name" : "BaseStructure",
+      "Extension" : null,
+      "Fields" : [
+        {"Key" : "Color", "Value" : "red"},
+        {"Key" : "Number", "Value" : 0}
+      ],
+      "Blocks" : []
+    },
+    {
+      "Name" : "PlayingCardStructure",
+      "Extension" : "BaseStructure",
+      "Fields" : [
+        {"Key" : "Color", "Value" : "green"},
+        {"Key" : "Number", "Value" : 0}
+      ],
+      "Blocks" : [
+        {"Type": "OnStartGameBlock", "Options": [
+          {"Type" : "OnlyTriggerIfTargetedBlock", "Inputs" : []}
+        ], "Inputs": [
+          [
+            {"Type": "LogBlock", "Inputs": ["this is log from the PlayingCardStructure!"]}
+          ]
+        ]},
+        {"Type": "OnDrawCardBlock", "Options": [], "Inputs": [
+          [
+            {"Type": "LogBlock", "Inputs": ["Again!"]}
+          ]
+        ]}
+      ]
+    }
+  ],
+  "GameModules" : [
+    {
+      "Name" : "Player",
+      "Type" : "Player",
+      "Structure": null,
+      "Description" : [
+        "Here is your numbers: ",
+        {"Type": "TernaryValueBlock", "Inputs" : [
+          {"Type" : "EqualsBlock", "Inputs" : [
+            {"Type" : "ContextValueBlock", "Inputs" : ["p"]},
+            {"Type" : "ContextValueBlock", "Inputs" : ["this"]}
+          ]},
+          "A",
+          "B"
+        ]},
+        ".  Enjoy!"
+      ],
+      "Fields" : [
+        {"Key" : "Color", "Value" : "blue"}
+      ],
+      "Blocks" : [
+        {"Type": "OnStartGameBlock", "Options": [
+
+        ], "Inputs": [
+          [
+            {"Type": "LogBlock", "Inputs": ["this is log from the Player!"]}
+          ]
+        ]}
+      ],
+      "Modules" : [
+        {
+          "Name" : "SafeZone",
+          "Type" : "Zone",
+          "Structure" : null,
+          "Fields" : [
+            {"Key" : "SafeAmount", "Value" : 78}
+          ],
+          "Blocks" : []
+        }
+      ]
+    },
+    {
+      "Name" : "DrawingDeck",
+      "Type" : "Deck",
+      "Structure" : null,
+      "Description" : [
+        "Here is your numbers: ",
+        {"Type": "ContextValueBlock", "Inputs" : ["AList"]},
+        ".  Enjoy! 444"
+      ],
+      "Color" : "#78963f",
+      "Position" : [0, 3, 90],
+      "Fields" : [
+        {"Key" : "Number", "Value" : 5}
+      ],
+      "Blocks" : [],
+      "Cards" : [
+        {
+          "Name" : "FiveBlue",
+          "Type" : "Card",
+          "Structure" : "PlayingCardStructure",
+          "FrontImage" : "an/address/to/image.png",
+          "BackImage" : "an/address/to/image2.png",
+          "Iterations" : 6,
+          "Fields" : [
+            {"Key" : "Color", "Value" : "blue"},
+            {"Key" : "Number", "Value" : 5}
+          ],
+          "Blocks" : []
+        }
+      ]
+    }
+  ],
+  "GlobalVariables" : [
+    {"Key": "AList", "Value" : [0, 1, 2, 3]}
+  ],
+  "GlobalBlocks" : [
+    {"Type": "OnStartGameBlock", "Inputs": [
+      [
+        {"Type": "IfBlock", "Inputs": [
+          {"Type": "EqualsBlock", "Inputs": ["hello", "hello"]},
+          [
+            {"Type": "LogBlock", "Inputs": ["this is the true branch!"]},
+            {"Type": "DrawCardBlock", "Inputs": [true,
+              {"Type": "ContextValueBlock", "Inputs" : ["Player0"]}, 
+              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
+            ]},
+            {"Type": "DrawCardBlock", "Inputs": [true,
+              {"Type": "ContextValueBlock", "Inputs" : ["Player0"]},
+              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
+            ]},
+            {"Type": "DrawCardBlock", "Inputs": [true,
+              {"Type": "ContextValueBlock", "Inputs" : ["Player0"]},
+              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
+            ]},
+            {"Type": "DrawCardBlock", "Inputs": [true,
+              {"Type": "ContextValueBlock", "Inputs" : ["Player0"]},
+              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
+            ]}
+          ]
+        ]}
+      ]
+    ]}
+  ],
+  "ScoringRules" : [
+    {"Tag" : "Lust", "Type" : "ForeachScoringRule", "Inputs" : [3, "PlayingCardStructure", "Hand"]},
+    {"Tag" : "Wrath", "Type" : "ValueScoringRule", "Inputs" : [89]}
+  ]
+}

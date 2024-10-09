@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgoraGameLogic", "AgoraGameLogic\AgoraGameLogic.csproj", "{611D49D6-E683-4B28-BE61-066778397D96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication", "ConsoleApplication\ConsoleApplication.csproj", "{1997EB81-38A6-4F2E-961C-0F7FD7693128}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{611D49D6-E683-4B28-BE61-066778397D96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{611D49D6-E683-4B28-BE61-066778397D96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{611D49D6-E683-4B28-BE61-066778397D96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{611D49D6-E683-4B28-BE61-066778397D96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1997EB81-38A6-4F2E-961C-0F7FD7693128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1997EB81-38A6-4F2E-961C-0F7FD7693128}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1997EB81-38A6-4F2E-961C-0F7FD7693128}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1997EB81-38A6-4F2E-961C-0F7FD7693128}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,145 @@
+{
+  "Id" : 0,
+  "Name" : "Uno",
+  "Structures" : [
+    {
+      "Name" : "PlayingCardStructure",
+      "Extension" : null,
+      "Fields" : [
+        {"Key" : "Color", "Value" : ""},
+        {"Key" : "Number", "Value" : 0}
+      ],
+      "Blocks" : [
+        
+        // On card play inside zone, update global varaiables top card color and number
+        {"Type": "OnPlayInsideZoneBlock", "Options": [], "Inputs": [
+          [
+            {"Type": "LogBlock", "Inputs" : [{"Type": "ContextValueBlock", "Inputs": ["TopCardColor"]}]},
+            
+            {"Type": "SetValueBlock", "Inputs" : ["TopCardColor", {"Type": "ContextValueBlock", "Inputs":  ["Card", ["Color"]]}]},
+            {"Type": "SetValueBlock", "Inputs" : ["TopCardNumber", {"Type": "ContextValueBlock", "Inputs":  ["Card", ["Number"]]}]},
+
+            {"Type": "LogBlock", "Inputs" : [{"Type": "ContextValueBlock", "Inputs": ["TopCardColor"]}]}
+          ]
+        ]}
+      ]
+    }
+  ],
+  "GameModules" : [
+    {
+      "Name" : "Player",
+      "Type" : "Player",
+      "Structure": null,
+      "Description" : [
+        "You have ", 
+        {"Type" : "CountValueBlock", "Inputs" : [{"Type": "ContextValueBlock", "Inputs" : ["this", ["Hand"]]}]}, 
+        " cards in hand."
+      ],
+      "Fields" : [],
+      "Blocks" : [
+        
+        // when a card is played from hand, check if hand is empty.  If true, end game!
+        {"Type": "OnPlayFromHandBlock", "Options": [], "Inputs": [
+          [
+            {"Type": "IfBlock", "Inputs": [
+              {"Type" :  "EqualsBlock", "Inputs" : [0,
+                {"Type" : "CountValueBlock", "Inputs" : [{"Type": "ContextValueBlock", "Inputs" : ["this", ["Hand"]]}]}
+              ]},
+              [
+                {"Type" : "EndGameBlock", "Inputs" : ["LeastCardsInHand"]}
+              ]
+            ]}
+          ]
+        ]}
+      ],
+      "Modules" : []
+    },
+    {
+      "Name" : "PlayingZone",
+      "Type" : "Zone",
+      "Structure" : null,
+      "Description" : [
+        "Top card is ", 
+        {"Type": "ContextValueBlock", "Inputs" : ["TopCardColor"]}, " ", 
+        {"Type": "ContextValueBlock", "Inputs" : ["TopCardNumber"]}
+      ],
+      "Position" : [0, -3, 90],
+      "Fields" : [],
+      "Blocks" : [],
+    },
+    {
+      "Name" : "DrawingDeck",
+      "Type" : "Deck",
+      "Structure" : null,
+      "Description" : [
+        "There is ", {"Type": "ContextValueBlock", "Inputs" : ["this", ["NumberOfCards"]]}, " inside deck"
+      ],
+      "Color" : "#78963f",
+      "Position" : [0, 3, 90],
+      "Fields" : [],
+      "Blocks" : [],
+      "Cards" : [
+        {
+          "Name" : "FiveBlue",
+          "Type" : "Card",
+          "Structure" : "PlayingCardStructure",
+          "FrontImage" : "an/address/to/image.png",
+          "BackImage" : "an/address/to/image2.png",
+          "Iterations" : 20,
+          "Fields" : [
+            {"Key" : "Color", "Value" : "blue"},
+            {"Key" : "Number", "Value" : 5}
+          ],
+          "Blocks" : []
+        }
+      ]
+    }
+  ],
+  "GlobalVariables" : [
+    {"Key": "TopCardColor", "Value": null},
+    {"Key": "TopCardNumber", "Value": null}
+  ],
+  "GlobalBlocks" : [
+    {"Type": "OnStartGameBlock", "Inputs": [
+      [
+        // Make each player draw 7 cards
+        {"Type" : "RepeatBlock", "Inputs" :  [2, 
+          [
+            {"Type" : "ForeachPlayerBlock", "Inputs" : ["p",
+              [
+                {"Type" : "DrawCardBlock", "Inputs" :  [false, 
+                  {"Type" : "ContextValueBlock", "Inputs" :  ["p"]}, 
+                  {"Type" : "ContextValueBlock", "Inputs" :  ["DrawingDeck"]}, 
+                ]},
+                {"type" : "SetValueBlock", "Inputs" : []}
+              ]
+            ]}
+          ]
+        ]},
+        
+        // Turn by turn
+        {"Type" : "TurnByTurnBlock", "Inputs" :  [1, 
+          [
+            // start branch.  Draw a card
+            
+          ],
+          [
+            // update branch.  Allow to play cards with same color or number
+            {"Type" : "ForeachBlock", "Inputs" : ["item", 
+              {"Type" : "ValueFieldBlock", "Inputs" : [{"Type": "ContextValueBlock", "Inputs" : ["player"]}, "Hand"]}, 
+              [
+                {"Type" : "PlayInsideZoneBlock", "Inputs" : [true,
+                  {"Type" : "ContextValueBlock", "Inputs" :  ["player"]},
+                  {"Type" : "ContextValueBlock", "Inputs" :  ["item"]},
+                  {"Type" : "ContextValueBlock", "Inputs" :  ["PlayingZone"]},
+                ]}
+              ]
+            ]},
+          ],
+          []
+        ]}
+      ]
+    ]},
+  ],
+  "ScoringRules" : []
+}

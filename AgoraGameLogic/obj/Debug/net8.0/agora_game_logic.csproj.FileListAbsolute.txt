@@ -1,0 +1,12 @@
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\bin\Debug\net8.0\agora_game_logic.deps.json
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\bin\Debug\net8.0\agora_game_logic.dll
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\bin\Debug\net8.0\agora_game_logic.pdb
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\agora_game_logic.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\agora_game_logic.AssemblyInfoInputs.cache
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\agora_game_logic.AssemblyInfo.cs
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\agora_game_logic.csproj.CoreCompileInputs.cache
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\agora_game_logic.dll
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\refint\agora_game_logic.dll
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\agora_game_logic.pdb
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\ref\agora_game_logic.dll
+C:\Users\courr\AGORA\Code\agora_game_logic\agora_game_logic\obj\Debug\net8.0\agora_game_logic.csproj.AssemblyReference.cache

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "qEI1rBb9fZ07iefO9nhNBH2VL81pzdKSQhoRfA+ZOrCCGMUjGrNmMppy37SYNYZxuUMarmgHS6fjrOqTuOgvtA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\courr\\AGORA\\Code\\AgoraGameLogic\\ConsoleApplication\\ConsoleApplication.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\courr\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
