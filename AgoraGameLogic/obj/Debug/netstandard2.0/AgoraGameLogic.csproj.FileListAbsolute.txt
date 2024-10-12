@@ -8,3 +8,4 @@ C:\Users\courr\AGORA\Code\AgoraGameLogic\AgoraGameLogic\obj\Debug\netstandard2.0
 C:\Users\courr\AGORA\Code\AgoraGameLogic\AgoraGameLogic\obj\Debug\netstandard2.0\AgoraGameLogic.csproj.CoreCompileInputs.cache
 C:\Users\courr\AGORA\Code\AgoraGameLogic\AgoraGameLogic\obj\Debug\netstandard2.0\AgoraGameLogic.dll
 C:\Users\courr\AGORA\Code\AgoraGameLogic\AgoraGameLogic\obj\Debug\netstandard2.0\AgoraGameLogic.pdb
+C:\Users\courr\AGORA\Code\AgoraGameLogic\AgoraGameLogic\obj\Debug\netstandard2.0\AgoraGameLogic.sourcelink.json

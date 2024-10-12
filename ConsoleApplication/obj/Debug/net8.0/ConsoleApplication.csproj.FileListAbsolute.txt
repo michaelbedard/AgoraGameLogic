@@ -36,3 +36,4 @@ C:\Users\courr\AGORA\Code\AgoraGameLogic\ConsoleApplication\obj\Debug\net8.0\ref
 C:\Users\courr\AGORA\Code\AgoraGameLogic\ConsoleApplication\obj\Debug\net8.0\ConsoleApplication.pdb
 C:\Users\courr\AGORA\Code\AgoraGameLogic\ConsoleApplication\obj\Debug\net8.0\ConsoleApplication.genruntimeconfig.cache
 C:\Users\courr\AGORA\Code\AgoraGameLogic\ConsoleApplication\obj\Debug\net8.0\ref\ConsoleApplication.dll
+C:\Users\courr\AGORA\Code\AgoraGameLogic\ConsoleApplication\obj\Debug\net8.0\ConsoleApplication.sourcelink.json

@@ -7,9 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Loader\" />
-      <Folder Include="Services\" />
-      <Folder Include="Logic\Blocks\Game\_options\" />
+      <Folder Include="Blocks\Controls\ControlOptions\" />
+      <Folder Include="Blocks\Dev\DevOptions\" />
+      <Folder Include="Blocks\Game\GameOptions\" />
+      <Folder Include="Blocks\Values\ValueOptions\" />
+      <Folder Include="Utility\" />
     </ItemGroup>
 
     <ItemGroup>

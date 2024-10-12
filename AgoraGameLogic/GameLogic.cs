@@ -33,8 +33,9 @@ public class GameLogic
     
     public string LoadGame(string gameBuild, int numberOfPlayers)
     {
+        _gameData.NumberOfPlayers = numberOfPlayers;
         var gameLoader = new GameLoader();
-
+        
         // parse
         var buildJObject = JObject.Parse(gameBuild);
         var buildDefinition = BuildDefinition.Parse(buildJObject);

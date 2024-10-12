@@ -19,6 +19,7 @@ public class GameData
     
     public Context GlobalContext = new Context();
     public IEnumerable<GameModule> Players = new GameModule[]{};
+    public int NumberOfPlayers;
     
     public bool GameIsRunning = false;
 

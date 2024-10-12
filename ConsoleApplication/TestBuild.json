@@ -55,25 +55,15 @@
         {"Key" : "Color", "Value" : "blue"}
       ],
       "Blocks" : [
-        {"Type": "OnStartGameBlock", "Options": [
-
-        ], "Inputs": [
-          [
-            {"Type": "LogBlock", "Inputs": ["this is log from the Player!"]}
-          ]
-        ]}
+//        {"Type": "OnStartGameBlock", "Options": [
+//
+//        ], "Inputs": [
+//          [
+//            // {"Type": "LogBlock", "Inputs": ["this is log from the Player!"]}
+//          ]
+//        ]}
       ],
-      "Modules" : [
-        {
-          "Name" : "SafeZone",
-          "Type" : "Zone",
-          "Structure" : null,
-          "Fields" : [
-            {"Key" : "SafeAmount", "Value" : 78}
-          ],
-          "Blocks" : []
-        }
-      ]
+      "Modules" : []
     },
     {
       "Name" : "DrawingDeck",
@@ -117,20 +107,8 @@
           {"Type": "EqualsBlock", "Inputs": ["hello", "hello"]},
           [
             {"Type": "LogBlock", "Inputs": ["this is the true branch!"]},
-            {"Type": "DrawCardBlock", "Inputs": [true,
+            {"Type": "DrawCardBlock", "Inputs": ["Allow",
               {"Type": "ContextValueBlock", "Inputs" : ["Player0"]}, 
-              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
-            ]},
-            {"Type": "DrawCardBlock", "Inputs": [true,
-              {"Type": "ContextValueBlock", "Inputs" : ["Player0"]},
-              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
-            ]},
-            {"Type": "DrawCardBlock", "Inputs": [true,
-              {"Type": "ContextValueBlock", "Inputs" : ["Player0"]},
-              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
-            ]},
-            {"Type": "DrawCardBlock", "Inputs": [true,
-              {"Type": "ContextValueBlock", "Inputs" : ["Player0"]},
               {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
             ]}
           ]
