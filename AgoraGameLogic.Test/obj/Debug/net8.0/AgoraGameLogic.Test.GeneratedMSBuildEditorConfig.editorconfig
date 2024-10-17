@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = AgoraGameLogic.Test
-build_property.ProjectDir = C:\Users\courr\AGORA\Code\AgoraGameLogic\AgoraGameLogic.Test\
+build_property.ProjectDir = C:\Users\Michael\RiderProjects\AgoraGameLogic\AgoraGameLogic.Test\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

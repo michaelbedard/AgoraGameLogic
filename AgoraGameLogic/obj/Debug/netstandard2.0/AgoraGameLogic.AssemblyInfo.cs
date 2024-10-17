@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AgoraGameLogic")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+28d7ebca3bd1a9fd4d85f2413ac2af92394b6b1c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5ae480a9e5d6c85aafe5245811776e3b1861eae3")]
 [assembly: System.Reflection.AssemblyProductAttribute("AgoraGameLogic")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AgoraGameLogic")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

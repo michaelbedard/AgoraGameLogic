@@ -44,19 +44,19 @@ namespace AgoraGameLogic.Entities
     {
         public T Value { get; }
 
-        protected Result(bool isSuccess, string error, ErrorBuilder? errorBuilder, T value) : base(isSuccess, error, errorBuilder)
+        protected Result(bool isSuccess, string error, T value, ErrorBuilder? errorBuilder = null) : base(isSuccess, error, errorBuilder)
         {
             Value = value;
         }
 
         public static Result<T> Success(T value)
         {
-            return new Result<T>(true, string.Empty, null, value);
+            return new Result<T>(true, string.Empty, value, null);
         }
 
-        public new static Result<T> Failure(string error, ErrorBuilder errorBuilder)
+        public new static Result<T> Failure(string error, ErrorBuilder? errorBuilder = null)
         {
-            return new Result<T>(false, error, errorBuilder, default);
+            return new Result<T>(false, error, default, errorBuilder);
         }
     }
 

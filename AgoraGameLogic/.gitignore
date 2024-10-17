@@ -1,0 +1,69 @@
+# Ignore build results
+bin/
+obj/
+
+# Ignore user-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.userprefs
+
+# Ignore build logs
+*.log
+*.tlog
+*.vspscc
+
+# Ignore Visual Studio specific files
+.vscode/
+.vs/
+*.code-workspace
+
+# Ignore Rider IDE specific files
+.idea/
+
+# Ignore Unity specific files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+Assets/Plugins/*/Plugins/*/Temp/
+
+# Ignore compiled assemblies
+*.dll
+*.exe
+*.pdb
+
+# Ignore NuGet packages
+*.nupkg
+packages/
+*.snupkg
+
+# Ignore node_modules (if you have a web front-end in your solution)
+node_modules/
+
+# Ignore cache files
+*.cache
+*.ide
+
+# Ignore generated code files
+*.g.cs
+*.g.i.cs
+
+# Ignore configuration files
+*.config
+*.csproj.user
+*.json
+
+# Ignore files related to testing
+TestResults/
+
+# Ignore distribution folder
+dist/
+
+# Ignore deployment scripts
+.publish/
+.deploy/
+
+# Ignore MacOS and Linux system files
+.DS_Store
