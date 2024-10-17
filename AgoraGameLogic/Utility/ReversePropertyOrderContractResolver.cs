@@ -12,6 +12,6 @@ public class ReversePropertyOrderContractResolver : DefaultContractResolver
         var properties = base.CreateProperties(type, memberSerialization);
 
         // Reverse the order of properties
-        return properties.Reverse().ToList();
+        return properties.Reverse().ToList(); // 
     }
 }
