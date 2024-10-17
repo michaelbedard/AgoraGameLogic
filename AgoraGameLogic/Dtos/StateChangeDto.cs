@@ -13,46 +13,68 @@ public class StateChangeDto
     public string ToString(bool showAnimations, bool showDescriptions)
     {
         var builder = new StringBuilder();
+        
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new ReversePropertyOrderContractResolver(),
+            Formatting = Formatting.None
+        };
 
-        builder.AppendLine("## StateChangeResult ##");
-
-
+        builder.AppendLine(">> Actions");
         foreach (var entry in Actions)
         {
-            builder.AppendLine($"Commands for {entry.Key} : ");
-            foreach (var command in entry.Value)
+            if (entry.Value.Length > 0)
             {
-                builder.AppendLine($"    Id: {command.Id}, Key: {command.Key}, Args: {JsonConvert.SerializeObject(command, Formatting.None)}, Options: {JsonConvert.SerializeObject(command.Options, Formatting.None)}");
+                builder.AppendLine($"Actions for {entry.Key} : ");
+                foreach (var command in entry.Value)
+                {
+                    builder.AppendLine($"    {JsonConvert.SerializeObject(command, settings)}");
+                }
             }
-
-            builder.AppendLine("");
+        }
+        
+        builder.AppendLine(">> Inputs");
+        foreach (var entry in Inputs)
+        {
+            if (entry.Value.Length > 0)
+            {
+                builder.AppendLine($"Inputs for {entry.Key} : ");
+                foreach (var command in entry.Value)
+                {
+                    builder.AppendLine($"    {JsonConvert.SerializeObject(command, settings)}");
+                }
+            }
         }
 
         if (showAnimations)
         {
+            builder.AppendLine(">> Animations");
             foreach (var entry in Animations)
             {
-                builder.AppendLine($"Animations for {entry.Key} : ");
-                foreach (var animation in entry.Value)
+                if (entry.Value.Length > 0)
                 {
-                    builder.AppendLine($"    Key: {animation.Key}, Args: {JsonConvert.SerializeObject(animation, Formatting.None)}, Options: {JsonConvert.SerializeObject(animation.Options, Formatting.None)}");
+                    builder.AppendLine($"Animations for {entry.Key} : ");
+                    foreach (var animation in entry.Value)
+                    {
+                        builder.AppendLine($"    {animation.ToString()}");
+                    }
                 }
-
-                builder.AppendLine("");
             }
         }
         
         if (showDescriptions)
         {
+            builder.AppendLine(">> Descriptions");
             foreach (var entry in Descriptions)
             {
-                builder.AppendLine($"Descriptions for {entry.Key} : ");
-                foreach (var description in entry.Value)
+                if (entry.Value.Length > 0)
                 {
-                    builder.AppendLine($"    Name: {description.Name}, Text: {description.Text}");
+                    builder.AppendLine($"Descriptions for {entry.Key} : ");
+                    foreach (var description in entry.Value)
+                    {
+                        builder.AppendLine($"    {description.ToString()}");
+                    }
                 }
-
-                builder.AppendLine("");
             }
         }
 

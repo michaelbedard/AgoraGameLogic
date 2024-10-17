@@ -6,6 +6,7 @@ using AgoraGameLogic.Domain.Enums;
 using AgoraGameLogic.Domain.Extensions;
 using AgoraGameLogic.Entities;
 using AgoraGameLogic.Logic.Blocks.Game;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AgoraGameLogic;
@@ -65,7 +66,7 @@ public class GameLogic
             .Then(() => gameLoader.LoadScoringRules(gameBuildData.ScoringRules, _gameData));
         if (!loadResult.IsSuccess)
         {
-            throw new Exception($"Error loading game: {loadResult.Error}");
+            throw new Exception($"[Error loading game] {loadResult.Error}");
         }
         
         // initialize services
@@ -74,7 +75,7 @@ public class GameLogic
             .Then(() => _gameData.AnimationService.InitializeDictionnaryEntries(_gameData.Players));
         if (!initializeResult.IsSuccess)
         {
-            throw new Exception($"Error initializing dictionnaries: {initializeResult.Error}");
+            throw new Exception($"[Error initializing dictionnaries] {initializeResult.Error}");
         }
 
         // log
@@ -94,7 +95,7 @@ public class GameLogic
         {
             if (t.Result != null && !t.Result.IsSuccess)
             {
-                Console.WriteLine($"Start game failed: {t.Result.Error}");
+                Console.WriteLine($"[Start game failed] {t.Result.Error}");
             }
         });
         
@@ -104,6 +105,13 @@ public class GameLogic
     public void PerformAction(string playerId, int actionCommandId)
     {
         if (!_gameData.GameIsRunning) return;
+
+        if (string.IsNullOrEmpty(playerId))
+        {
+            Console.WriteLine($"[Action failed] PlayerId canot be null or empty");
+            InvokeOnGameStateChange();
+            return;
+        }
         
         // perform action
         var task = _gameData.ActionService.PerformActionAsync(_gameData.GlobalContext.Copy(), playerId, actionCommandId);
@@ -112,7 +120,7 @@ public class GameLogic
         {
             if (t.Result != null && !t.Result.IsSuccess)
             {
-                Console.WriteLine($"Action failed: {t.Result.Error}");
+                Console.WriteLine($"[Action failed] {t.Result.Error}");
             }
         });
         
@@ -153,7 +161,6 @@ public class GameLogic
         {
             throw new Exception(descriptionsResult.Error);
         }
-        
         
         // build state change Dto and invoke 
         _gameData.OnGameStateChange.Invoke(new StateChangeDto()

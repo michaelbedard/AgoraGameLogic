@@ -1,3 +1,4 @@
+using AgoraGameLogic.Domain.Entities.Utility;
 using AgoraGameLogic.Domain.Interfaces;
 using Newtonsoft.Json;
 
@@ -93,26 +94,35 @@ public class Context : IContext
     public override string ToString()
     {
         var result = new Dictionary<string, object>();
-
+    
         foreach (var entry in _context)
         {
-            if (entry.Value is GameModule module)
+            if (entry.Value is Ref<GameModule> moduleRef)
             {
-                result[entry.Key] = module.Name + "*";
+                result[entry.Key] = moduleRef.Value;
             }
-            else if (entry.Value is List<GameModule> moduleList)
+            else if (entry.Value is Ref<List<GameModule>> moduleListRef)
             {
-                // If the value is a list of ContextGameModules, return a list of their Names
-                result[entry.Key] = moduleList.ConvertAll(m => m.Name + "*");
+                var moduleIds = moduleListRef.Value.Select(m => m.Id).ToList();
+                result[entry.Key] = moduleIds; 
             }
             else
             {
                 // Otherwise, return the value as it is
-                result[entry.Key] = entry.Value.ToString();
+                result[entry.Key] = ((Ref<Value<object>>)entry.Value).Value.GetValue(this).Value;
             }
         }
+        // Create custom settings to include fields
+        var settings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver
+            {
+                DefaultMembersSearchFlags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy
+            }
+        };
 
-        // Serialize the dictionary to a JSON-formatted string
-        return JsonConvert.SerializeObject(result, Formatting.Indented);
+        // Serialize the dictionary to a JSON-formatted string with custom settings
+        return JsonConvert.SerializeObject(result, settings);
     }
 }

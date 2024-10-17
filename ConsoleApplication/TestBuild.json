@@ -111,6 +111,20 @@
               {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
             ]}
           ]
+        ]},
+        {"Type" : "TurnByTurnBlock", "Inputs" : [
+          [
+            // start branch
+            {"Type": "LogBlock", "Inputs": ["START"]}
+          ], 
+          [
+            // update branch
+            {"Type": "LogBlock", "Inputs": ["UPDATE"]}
+          ], 
+          [
+            // end branch
+            {"Type": "LogBlock", "Inputs": ["END"]}
+          ]
         ]}
       ]
     ]}

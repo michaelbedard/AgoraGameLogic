@@ -15,20 +15,16 @@ var jsonContent = File.ReadAllText(jsonFilePath);
 var gameLogic = new GameLogic();
 gameLogic.LoadGame(jsonContent, 4);
 
-// setup logic handler
-CancellationTokenSource? inputCancellationTokenSource = null;
+// setup logic
 var gameHasEnd = false;
+int executionIndex = 0; // Track execution index
 
 gameLogic.OnGameStateChange += stateChangeResult =>
 {
     if (gameHasEnd) return;
-    
-    inputCancellationTokenSource?.Cancel();
-    
-    inputCancellationTokenSource = new CancellationTokenSource();
-    var token = inputCancellationTokenSource.Token;
-    
-    Console.WriteLine("\nResult: ");
+
+    // log stateChangeResult
+    Console.WriteLine("\n[RESULT]");
     Console.WriteLine(stateChangeResult.ToString(true, true));
     
     try
@@ -36,23 +32,14 @@ gameLogic.OnGameStateChange += stateChangeResult =>
         while (true)
         {
             // Ask for user input unless cancelled
-            Console.Write("\nEnter a commandId to perform: ");
-            
-            while (!Console.KeyAvailable)
-            {
-                if (token.IsCancellationRequested)
-                {
-                    Console.WriteLine("\nInput request cancelled. Awaiting new state...");
-                    return;
-                }
-                Thread.Sleep(100); // Small delay to avoid busy waiting
-            }
+            Console.Write("Enter a commandId and optional argument: ");
             
             var input = Console.ReadLine();
-            if (int.TryParse(input, out var actionId) && actionId >= 0)
+            var inputParts = input?.Split(' ', 2); // Split input into commandId and optional argument
+            
+            if (inputParts != null && int.TryParse(inputParts[0], out var actionId) && actionId >= 0)
             {
-                // Execute the selected action
-                Console.Write("\n#####################################################\n");
+                var argument = inputParts.Length > 1 ? inputParts[1] : null; // Optional argument
 
                 var playerId = "";
                 foreach (var entry in stateChangeResult.Actions)
@@ -62,15 +49,38 @@ gameLogic.OnGameStateChange += stateChangeResult =>
                         if (command.Id == actionId)
                         {
                             playerId = entry.Key;
-                            continue;
+                            break;
                         }
                     }
                     
-                    if (!string.IsNullOrEmpty(playerId)) continue;
+                    if (!string.IsNullOrEmpty(playerId)) break;
                 }
-                
-                gameLogic.PerformAction(playerId, actionId);
-                break; // Exit the loop after valid input
+
+                if (!string.IsNullOrEmpty(playerId))
+                {
+                    // Track execution index only after valid input
+                    executionIndex++;
+                    Console.Write($"\n######################## EXECUTION {executionIndex}\n");
+                    Console.WriteLine("[LOGS]");
+
+                    if (string.IsNullOrEmpty(argument))
+                    {
+                        // Perform action without arguments
+                        gameLogic.PerformAction(playerId, actionId);
+                        Console.WriteLine("");
+                    }
+                    else
+                    {
+                        // Perform action with argument
+                        gameLogic.PerformInput(playerId, actionId, argument);
+                        Console.WriteLine("");
+                    }
+                    break; // Exit the loop after valid input
+                }
+                else
+                {
+                    Console.WriteLine("Action not found for the given commandId. Please try again.");
+                }
             }
             else
             {
@@ -90,4 +100,6 @@ gameLogic.OnEndGame += r =>
     Console.WriteLine(JsonConvert.SerializeObject(r));
 };
 
+Console.Write($"\n######################## START");
+Console.WriteLine("\n[LOGS]");
 gameLogic.StartGame();

@@ -5,11 +5,11 @@ namespace AgoraGameLogic.Domain.Entities.Models;
 
 public class GameModule
 {
-    public string Id;
-    public string Name;
-    public GameModuleType Type;
-    public string[] Structures;
-    public Context Fields;
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public GameModuleType Type { get; set; }
+    public string[] Structures { get; set; }
+    public Context Fields { get; set; }
 
     public GameModule(string id, string name, GameModuleType type, string[] structures)
     {
@@ -52,16 +52,16 @@ public class GameModule
         return result;
     }
     
-    public override string ToString()
-    {
-        var output = new
-        {
-            Name = Name,
-            Type = Type,
-            Fields = Fields.ToString()
-        };
-
-        // Serialize and print the output
-        return JsonConvert.SerializeObject(output, Formatting.None).Replace("\"", "");
-    }
+    // public override string ToString()
+    // {
+    //     var output = new
+    //     {
+    //         Name = Name,
+    //         Type = Type,
+    //         Fields = Fields.ToString()
+    //     };
+    //
+    //     // Serialize and print the output
+    //     return JsonConvert.SerializeObject(output, Formatting.None).Replace("\"", "");
+    // }
 }

@@ -105,7 +105,7 @@ public abstract class ActionCommand<TCommand, TBlock, TEvent> : ActionCommand
     public override CommandDto GetDto()
     {
         var temp = InitializeDto();
-        temp.Key = nameof(TCommand);
+        temp.Key = typeof(TCommand).Name;
         temp.Options = Options;
         temp.TargetId = Target.Id;
 
