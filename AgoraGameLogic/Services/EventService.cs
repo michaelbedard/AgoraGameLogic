@@ -1,8 +1,6 @@
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Interfaces;
 using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks;
-using AgoraGameLogic.Logic.Blocks._options;
 using AgoraGameLogic.Logic.Blocks.Values;
 
 namespace AgoraGameLogic.Control.Services;
@@ -30,7 +28,11 @@ public class EventService : IEventService
         }
         catch (Exception ex)
         {
-            return Result.Failure($"Failed to register module event: {ex.Message}");
+            return Result.Failure($"Failed to register module event: {ex.Message}", new ErrorBuilder()
+            {
+                ClassName = nameof(EventService),
+                MethodName = nameof(RegisterModuleEvent)
+            });
         }
     }
     
@@ -46,7 +48,11 @@ public class EventService : IEventService
         }
         catch (Exception ex)
         {
-            return Result.Failure($"Failed to register global event: {ex.Message}");
+            return Result.Failure($"Failed to register global event: {ex.Message}", new ErrorBuilder()
+            {
+                ClassName = nameof(EventService),
+                MethodName = nameof(RegisterModuleEvent)
+            });
         }
     }
 
@@ -68,7 +74,7 @@ public class EventService : IEventService
                     var result = await eventBlock.TriggerAsync(gameModule, context, command, scope);
                     if (!result.IsSuccess)
                     {
-                        return Result.Failure($"Failed to trigger event: {result.Error}");
+                        return Result.Failure($"Failed to trigger module event: {result.Error}");
                     }
                 }
             }

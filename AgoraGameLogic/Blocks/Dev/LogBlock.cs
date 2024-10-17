@@ -18,7 +18,24 @@ public class LogBlock : StatementBlockBase
 
     public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
     {
-        Console.WriteLine(Data.GetValue(context));
-        return Result.Success();
+        try
+        {
+            var dataResult = Data.GetValue(context);
+            if (!dataResult.IsSuccess)
+            {
+                return Result.Failure(dataResult.Error);
+            }
+
+            Console.WriteLine(dataResult.Value);
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure($"Unexpected Error: {e.Message}", new ErrorBuilder()
+            {
+                ClassName = nameof(LogBlock),
+                Context = context
+            });
+        }
     }
 }

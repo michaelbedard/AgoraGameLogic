@@ -1,7 +1,7 @@
 ﻿using AgoraGameLogic;
 using Newtonsoft.Json;
 
-var jsonFilePath = "C:\\Users\\courr\\AGORA\\Code\\AgoraGameLogic\\ConsoleApplication\\TestBuild.json";
+var jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "TestBuild.json");
 
 if (!File.Exists(jsonFilePath))
 {

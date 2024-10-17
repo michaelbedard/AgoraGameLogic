@@ -19,13 +19,12 @@
         {"Key" : "Number", "Value" : 0}
       ],
       "Blocks" : [
-        {"Type": "OnStartGameBlock", "Options": [
-          {"Type" : "OnlyTriggerIfTargetedBlock", "Inputs" : []}
-        ], "Inputs": [
-          [
-            {"Type": "LogBlock", "Inputs": ["this is log from the PlayingCardStructure!"]}
-          ]
-        ]},
+//        {"Type": "OnStartGameBlock", "Options": [], 
+//          "Inputs": [
+//          [
+//            {"Type": "LogBlock", "Inputs": ["this is log from the PlayingCardStructure!"]}
+//          ]
+//        ]},
         {"Type": "OnDrawCardBlock", "Options": [], "Inputs": [
           [
             {"Type": "LogBlock", "Inputs": ["Again!"]}

@@ -3,6 +3,7 @@ using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Entities.Utility;
 using AgoraGameLogic.Domain.Interfaces;
 using AgoraGameLogic.Entities;
+using Newtonsoft.Json.Serialization;
 
 namespace AgoraGameLogic.Logic.Blocks.Operators;
 
@@ -21,14 +22,26 @@ public class EqualsBlock : ConditionBlockBase
     {
         try
         {
-            var firstValue = _firstValue.GetValue(context);
-            var secondValue = _secondValue.GetValue(context);
+            var firstResult= _firstValue.GetValue(context);
+            if (!firstResult.IsSuccess)
+            {
+                return Result<bool>.Failure(firstResult.Error);
+            }
+            
+            var secondResult = _secondValue.GetValue(context);
+            if (!secondResult.IsSuccess)
+            {
+                return Result<bool>.Failure(secondResult.Error);
+            }
 
-            return Result<bool>.Success(firstValue.Equals(secondValue));
+            return Result<bool>.Success(firstResult.Value.Equals(secondResult.Value));
         }
         catch (Exception e)
         {
-            return Result<bool>.Failure(e.Message);
+            return Result<bool>.Failure($"Unexpected Error: {e.Message}", new ErrorBuilder()
+            {
+                ClassName = nameof(EqualsBlock)
+            });
         }
     }
 }

@@ -16,33 +16,35 @@ public abstract class CommandService<TCommand> where TCommand : Command
     {
         try
         {
-            // init store for player, if needed
-            if (!CommandStoresByPlayerName.ContainsKey(player.Name))
-            {
-                CommandStoresByPlayerName[player.Name] = new CommandStore<TCommand>();
-            }
-
             // set id and register command
             item.Id = _counter++;
-            var store = CommandStoresByPlayerName[player.Name];
-            var result = store.RegisterCommand(item);
+            var store = CommandStoresByPlayerName[player.Id];
+            var registerResult = store.RegisterCommand(item);
 
-            return result.IsSuccess ? Result.Success() : Result.Failure(result.Error);
+            return registerResult;
         }
         catch (Exception e)
         {
-            return Result.Failure(e.Message);
+            return Result.Failure(e.Message, new ErrorBuilder()
+            {
+                ClassName = nameof(CommandService<TCommand>),
+                MethodName = nameof(PushCommand),
+            });
         }
     }
     
     public Result PullCommand(TCommand item, GameModule player)
     {
-        if (!CommandStoresByPlayerName.ContainsKey(player.Name))
+        if (!CommandStoresByPlayerName.ContainsKey(player.Id))
         {
-            return Result.Failure($"No command store found for player {player.Name}");
+            return Result.Failure($"No command store found for player {player.Id}", new ErrorBuilder()
+            {
+                ClassName = nameof(CommandService<TCommand>),
+                MethodName = nameof(PullCommand),
+            });
         }
         
-        var store = CommandStoresByPlayerName[player.Name];
+        var store = CommandStoresByPlayerName[player.Id];
         var commandsToRemove = new List<TCommand>();
 
         // get all commands for this player
@@ -93,19 +95,27 @@ public abstract class CommandService<TCommand> where TCommand : Command
             }
         }
 
-        return Result.Failure($"Command with ID {commandId} not found.");
+        return Result.Failure($"Command with ID {commandId} not found.", new ErrorBuilder()
+        {
+            ClassName = nameof(CommandService<TCommand>),
+            MethodName = nameof(RemoveCommand),
+        });
     }
 
     
-    public Result<TCommand> GetCommand(string playerName, int commandId)
+    public Result<TCommand> GetCommand(string playerId, int commandId)
     {
         // get store for player
-        if (CommandStoresByPlayerName.TryGetValue(playerName, out var store))
+        if (!CommandStoresByPlayerName.ContainsKey(playerId))
         {
-            return store.GetCommand(commandId);
+            return Result<TCommand>.Failure($"Cannot get command {commandId} as player {playerId} has no command store yet", new ErrorBuilder()
+            {
+                ClassName = nameof(CommandService<TCommand>),
+                MethodName= nameof(GetCommand)
+            });
         }
-
-        return Result<TCommand>.Failure($"Player {playerName} has no command store.");
+        
+        return CommandStoresByPlayerName[playerId].GetCommand(commandId);
     }
 
     
@@ -130,9 +140,13 @@ public abstract class CommandService<TCommand> where TCommand : Command
                     if (scope != null && 
                         scope.TurnBlock == turnBlock && 
                         scope.ScopeType == scopeType && 
-                        scope.PlayerId == player.Name)
+                        scope.PlayerId == player.Id)
                     {
-                        store.RemoveCommand(command);
+                        var removeResult = store.RemoveCommand(command);
+                        if (!removeResult.IsSuccess)
+                        {
+                            return Result.Failure(removeResult.Error);
+                        }
                     }
                 }
             }
@@ -141,7 +155,11 @@ public abstract class CommandService<TCommand> where TCommand : Command
         }
         catch (Exception e)
         {
-            return Result.Failure(e.Message);
+            return Result<TCommand>.Failure(e.Message, new ErrorBuilder()
+            {
+                ClassName = nameof(CommandService<TCommand>),
+                MethodName= nameof(GetCommand)
+            });
         }
     }
     
@@ -160,7 +178,28 @@ public abstract class CommandService<TCommand> where TCommand : Command
         }
         catch (Exception e)
         {
-            return Result<Dictionary<string, CommandDto[]>>.Failure(e.Message);
+            return Result<Dictionary<string, CommandDto[]>>.Failure(e.Message, new ErrorBuilder()
+            {
+                ClassName = nameof(CommandService<TCommand>),
+                MethodName= nameof(GetCommand)
+            });
+        }
+    }
+
+    public Result InitializeDictionnaryEntries(List<GameModule> players)
+    {
+        try
+        {
+            foreach (var player in players)
+            {
+                CommandStoresByPlayerName[player.Id] = new CommandStore<TCommand>();
+            }
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message);
         }
     }
 }

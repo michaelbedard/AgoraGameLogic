@@ -55,7 +55,7 @@ public class GameLogic
         
         // set players
         var gameModulesToBuildData = gameModulesToBuildDataResult.Value;
-        _gameData.Players = gameModulesToBuildData.Keys.Where(gm => gm.Type == GameModuleType.Player);
+        _gameData.Players = gameModulesToBuildData.Keys.Where(gm => gm.Type == GameModuleType.Player).ToList();
         
         // load descriptions, game module events, global variables, global events and scoring rules
         var loadResult = gameLoader.LoadDescriptions(gameModulesToBuildData, gameBuildData.Structures, _gameData)
@@ -63,10 +63,18 @@ public class GameLogic
             .Then(() => gameLoader.LoadGlobalVariables(gameBuildData.GlobalVariables, _gameData))
             .Then(() => gameLoader.LoadGlobalEvents(gameBuildData.GlobalBlocks, _gameData))
             .Then(() => gameLoader.LoadScoringRules(gameBuildData.ScoringRules, _gameData));
-
         if (!loadResult.IsSuccess)
         {
             throw new Exception($"Error loading game: {loadResult.Error}");
+        }
+        
+        // initialize services
+        var initializeResult = _gameData.InputService.InitializeDictionnaryEntries(_gameData.Players)
+            .Then(() => _gameData.ActionService.InitializeDictionnaryEntries(_gameData.Players))
+            .Then(() => _gameData.AnimationService.InitializeDictionnaryEntries(_gameData.Players));
+        if (!initializeResult.IsSuccess)
+        {
+            throw new Exception($"Error initializing dictionnaries: {initializeResult.Error}");
         }
 
         // log
@@ -79,13 +87,14 @@ public class GameLogic
     {
         _gameData.GameIsRunning = true;
         
-        Task.Run(async () =>
+        // perform action
+        var task = _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(_gameData.GlobalContext.Copy(), new StartGameCommand(), null);
+
+        task.ContinueWith(t =>
         {
-            // perform action
-            var result = await _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(_gameData.GlobalContext.Copy(), new StartGameCommand(), null);
-            if (!result.IsSuccess)
+            if (t.Result != null && !t.Result.IsSuccess)
             {
-                Console.WriteLine($"Start game failed: {result.Error}");
+                Console.WriteLine($"Start game failed: {t.Result.Error}");
             }
         });
         
@@ -96,15 +105,14 @@ public class GameLogic
     {
         if (!_gameData.GameIsRunning) return;
         
-        Task.Run(async () =>
-        {
-            // perform action
-            var result = await _gameData.ActionService
-                .PerformActionAsync(_gameData.GlobalContext.Copy(), playerId, actionCommandId);
+        // perform action
+        var task = _gameData.ActionService.PerformActionAsync(_gameData.GlobalContext.Copy(), playerId, actionCommandId);
 
-            if (!result.IsSuccess)
+        task.ContinueWith(t =>
+        {
+            if (t.Result != null && !t.Result.IsSuccess)
             {
-                Console.WriteLine($"Action failed: {result.Error}");
+                Console.WriteLine($"Action failed: {t.Result.Error}");
             }
         });
         

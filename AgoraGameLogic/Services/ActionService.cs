@@ -6,11 +6,11 @@ namespace AgoraGameLogic.Control.Services;
 
 public class ActionService : CommandService<ActionCommand>, IActionService
 {
-    public async Task<Result> PerformActionAsync(IContext context, string playerName, int id)
+    public async Task<Result> PerformActionAsync(IContext context, string playerId, int id)
     {
         try
         {
-            var commandResult = GetCommand(playerName, id);
+            var commandResult = GetCommand(playerId, id);
             if (!commandResult.IsSuccess)
             {
                 return Result.Failure(commandResult.Error);
@@ -22,12 +22,14 @@ public class ActionService : CommandService<ActionCommand>, IActionService
                 return Result.Failure(removeResult.Error);
             }
 
-            var performResult = await commandResult.Value.PerformAsync(context, true);
-            return performResult.IsSuccess ? Result.Success() : Result.Failure(performResult.Error);
+            return await commandResult.Value.PerformAsync(context, true);
         }
         catch (Exception e)
         {
-            return Result.Failure(e.Message);
+            return Result.Failure(e.Message, new ErrorBuilder()
+            {
+                ClassName = nameof(ActionService)
+            });
         }
     }
 }

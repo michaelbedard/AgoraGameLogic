@@ -19,7 +19,7 @@ public class GameData
     public ScoringService ScoringService = new ScoringService();
     
     public Context GlobalContext = new Context();
-    public IEnumerable<GameModule> Players = new GameModule[]{};
+    public List<GameModule> Players = new List<GameModule>();
     public int NumberOfPlayers;
     
     public bool GameIsRunning = false;

@@ -1,5 +1,6 @@
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 
 namespace AgoraGameLogic.Core.Entities.Utility;
 
@@ -18,62 +19,69 @@ public class PendingRequest<T> where T : Command
         _isPush = isPush;
     }
 
-    public void For(GameModule player)
+    public Result For(GameModule player)
     {
         if (_isPush)
         {
-            _commandService.PushCommand(_item, player);
+            var pushResult = _commandService.PushCommand(_item, player);
+            if (!pushResult.IsSuccess)
+            {
+                return Result.Failure(pushResult.Error);
+            }
         }
         else
         {
-            _commandService.PullCommand(_item, player);
+            var pullResult = _commandService.PullCommand(_item, player);
+            if (!pullResult.IsSuccess)
+            {
+                return Result.Failure(pullResult.Error);
+            }
         }
+
+        return Result.Success();
     }
     
-    public void For(IEnumerable<GameModule> players)
+    public Result For(IEnumerable<GameModule> players)
     {
         foreach (var player in players)
         {
-            if (_isPush)
+            var pushOrPullResult = For(player);
+            if (!pushOrPullResult.IsSuccess)
             {
-                _commandService.PushCommand(_item, player);
-            }
-            else
-            {
-                _commandService.PullCommand(_item, player);
+                return Result.Failure(pushOrPullResult.Error);
             }
         }
+
+        return Result.Success();
     }
     
-    public void ForAll()
+    public Result ForAll()
     {
         foreach (var player in _players)
         {
-            if (_isPush)
+            var pushOrPullResult = For(player);
+            if (!pushOrPullResult.IsSuccess)
             {
-                _commandService.PushCommand(_item, player);
-            }
-            else
-            {
-                _commandService.PullCommand(_item, player);
+                return Result.Failure(pushOrPullResult.Error);
             }
         }
+
+        return Result.Success();
     }
     
-    public void ForAllExcept(GameModule playerToExempt)
+    public Result ForAllExcept(GameModule playerToExempt)
     {
         foreach (var player in _players)
         {
             if (player == playerToExempt) continue;
             
-            if (_isPush)
+            var pushOrPullResult = For(player);
+            if (!pushOrPullResult.IsSuccess)
             {
-                _commandService.PushCommand(_item, player);
-            }
-            else
-            {
-                _commandService.PullCommand(_item, player);
+                return Result.Failure(pushOrPullResult.Error);
             }
         }
+
+        return Result.Success();
     }
 }

@@ -62,24 +62,31 @@ namespace AgoraGameLogic.Entities
 
     public class ErrorBuilder
     {
-        public IContext? Context { get; set; }
+        public string? ClassName { get; set; }
+        public string? MethodName { get; set; }
         public GameModule? GameModule { get; set; }
-        public Type? Type { get; set; }
+        public IContext? Context { get; set; }
         public Scope? Scope { get; set; }
-        
+        public string? Details { get; set; }
+
         public string GetErrorMessage(string error)
         {
             var builder = new StringBuilder();
             builder.AppendLine(error);
             
+            if (ClassName != null)
+            {
+                builder.AppendLine($"ClassName: " + ClassName);
+            }
+            
+            if (MethodName != null)
+            {
+                builder.AppendLine($"MethodName: " + MethodName);
+            }
+            
             if (GameModule != null)
             {
                 builder.AppendLine($"GameModule: " + GameModule.ToString());
-            }
-            
-            if (Type != null)
-            {
-                builder.AppendLine($"Type: " + nameof(Type));
             }
             
             if (Context != null)
@@ -90,6 +97,11 @@ namespace AgoraGameLogic.Entities
             if (Scope != null)
             {
                 builder.AppendLine($"Context: " + Scope.ToString());
+            }
+            
+            if (Details != null)
+            {
+                builder.AppendLine($"Details: " + Details);
             }
 
             return builder.ToString();

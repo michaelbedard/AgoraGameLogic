@@ -14,4 +14,5 @@ public interface ICommandService<T> where T : Command
     Result<T> GetCommand(string playerName, int commandId);
     Result FilterActions(TurnBlockBlockBase turnBlock, ScopeType scopeType, GameModule player);
     Result<Dictionary<string, CommandDto[]>> GetDtos();
+    Result InitializeDictionnaryEntries(List<GameModule> players);
 }

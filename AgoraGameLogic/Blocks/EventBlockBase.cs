@@ -49,11 +49,25 @@ public abstract class EventBlockBase<TCommand> : EventBlockBase
                     return await TriggerAsync(context, specificCommand, scope);
                }
 
-               return Result.Failure($"Invalid type of command");
+               return Result.Failure($"Called {nameof(TriggerAsync)} with invalid command type.  Expected {typeof(TCommand)} but got {command.Type}", new ErrorBuilder()
+               {
+                    ClassName = nameof(EventBlockBase),
+                    MethodName = nameof(TriggerAsync),
+                    Context = context,
+                    GameModule = gameModule,
+                    Scope = scope,
+               });
           }
           catch (Exception e)
           {
-               return Result.Failure(e.Message);
+               return Result.Failure($"Unexpected Errors: {e.Message}", new ErrorBuilder()
+               {
+                    ClassName = nameof(EventBlockBase),
+                    MethodName = nameof(TriggerAsync),
+                    Context = context,
+                    GameModule = gameModule,
+                    Scope = scope,
+               });
           }
      }
 }
