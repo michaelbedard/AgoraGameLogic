@@ -21,6 +21,8 @@ public abstract class InputBlockBase<TCommand, TBlock, TEvent> : InputBlockBase
     where TBlock : InputBlockBase<TCommand, TBlock, TEvent>
     where TEvent : EventBlockBase
 {
+    // TYODO dfine Scope here
+    
     protected InputBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
     }
@@ -31,6 +33,7 @@ public abstract class InputBlockBase<TCommand, TBlock, TEvent> : InputBlockBase
     {
         try
         {
+            Scope = Scope = scope;
             var command = GetCommandOrThrow(context);
             PushInputOrThrow(command).For(command.Target);
 

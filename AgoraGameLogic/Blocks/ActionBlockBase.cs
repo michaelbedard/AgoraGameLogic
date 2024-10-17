@@ -33,6 +33,7 @@ public abstract class ActionBlockBase<TCommand, TBlock, TEvent> : ActionBlockBas
     {
         try
         {
+            Scope = scope;
             var behavior= BehaviorValue.GetValueOrThrow(context);
             var command = GetCommandOrThrow(context);
         
