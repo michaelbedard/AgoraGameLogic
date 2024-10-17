@@ -1,9 +1,9 @@
-using AgoraGameLogic.Control.Services;
 using AgoraGameLogic.Core.Entities.Utility;
 using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Enums;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 using AgoraGameLogic.Logic.Blocks.Values;
 
 namespace AgoraGameLogic.Logic.Blocks;
@@ -15,15 +15,15 @@ namespace AgoraGameLogic.Logic.Blocks;
 /// </summary>
 public abstract class StatementBlockBase : BlockBase
 {
-    private AnimationService _animationService;
-    private ActionService _actionService;
-    private InputService _inputService;
-    private EventService _eventService;
+    private IAnimationService _animationService;
+    private IActionService _actionService;
+    private IInputService _inputService;
+    private IEventService _eventService;
     
     public Scope? Scope;
     public TaskCompletionSource<bool> CompletionSource;
     
-    protected StatementBlockBase(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    protected StatementBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
         BlockType = BlockType.StatementBlock;
         
@@ -37,24 +37,24 @@ public abstract class StatementBlockBase : BlockBase
     
     // ABSTRACT
 
-    public abstract Task ExecuteAsync(IContext context, Scope? scope);
+    public abstract Task<Result> ExecuteAsync(IContext context, Scope? scope);
     
     // METHODS
     
     #region EVENTS
 
-    public async Task TriggerEventsAsync<T>(IContext context, object[] args) where T : EventBlockBase
+    public async Task<Result> TriggerEventsAsync<T>(IContext context, Command command) where T : EventBlockBase
     {
-        await _eventService.TriggerEventsAsync<T>(context, args, Scope);
+        return await _eventService.TriggerEventsAsync<T>(context, command, Scope);
     }
 
     #endregion
     
     #region ANIMATION
 
-    public PendingRequest<AnimationCommandBase> PushAnimation(AnimationCommandBase animationCommandBase)
+    public PendingRequest<AnimationCommand> PushAnimationOrThrow(AnimationCommand animationCommand)
     {
-        return new PendingRequest<AnimationCommandBase>(animationCommandBase, _animationService, Players);
+        return new PendingRequest<AnimationCommand>(animationCommand, _animationService, Players);
         
     }
 
@@ -62,35 +62,35 @@ public abstract class StatementBlockBase : BlockBase
     
     #region ACTION
 
-    public PendingRequest<ActionCommandBase> PushAction(ActionCommandBase actionCommandBase)
+    public PendingRequest<ActionCommand> PushActionOrThrow(ActionCommand actionCommand)
     {
-        return new PendingRequest<ActionCommandBase>(actionCommandBase, _actionService, Players);
+        return new PendingRequest<ActionCommand>(actionCommand, _actionService, Players);
     }
     
-    public PendingRequest<ActionCommandBase> PullAction(ActionCommandBase actionCommandBase)
+    public PendingRequest<ActionCommand> PullActionOrThrow(ActionCommand actionCommand)
     {
-        return new PendingRequest<ActionCommandBase>(actionCommandBase, _actionService, Players, false);
+        return new PendingRequest<ActionCommand>(actionCommand, _actionService, Players, false);
     }
 
     #endregion
     
     #region INPUT
     
-    public PendingRequest<InputCommandBase> PushInput(InputCommandBase inputCommandBase)
+    public PendingRequest<InputCommand> PushInputOrThrow(InputCommand inputCommand)
     {
-        return new PendingRequest<InputCommandBase>(inputCommandBase, _inputService, Players);
+        return new PendingRequest<InputCommand>(inputCommand, _inputService, Players);
     }
     
-    public PendingRequest<InputCommandBase> PullInput(InputCommandBase inputCommandBase)
+    public PendingRequest<InputCommand> PullInputOrThrow(InputCommand inputCommand)
     {
-        return new PendingRequest<InputCommandBase>(inputCommandBase, _inputService, Players, false);
+        return new PendingRequest<InputCommand>(inputCommand, _inputService, Players, false);
     }
 
     #endregion
     
     #region REVERT
 
-    protected void RegisterRevertibleBlock(IRevertible revertibleBlock)
+    protected Result RegisterRevertibleBlock(IRevertible revertibleBlock)
     {
         throw new NotImplementedException();
     }
@@ -113,56 +113,4 @@ public abstract class StatementBlockBase : BlockBase
     }
 
     #endregion
-    
-    
-    
-    
-    // private Context? _blockContext; // Necessary for null-checks
-    //
-    // protected Context BlockContext
-    // {
-    //     get
-    //     {
-    //         if (_blockContext == null)
-    //         {
-    //             throw new InvalidOperationException("Context is not initialized.");
-    //         }
-    //         return _blockContext;
-    //     }
-    //     set
-    //     {
-    //         if (value == null)
-    //         {
-    //             throw new ArgumentNullException(nameof(value), "Context cannot be null.");
-    //         }
-    //         _blockContext = value;
-    //     }
-    // }
-    //
-    // protected ExecutionThread? BlockThread;
-    // protected ExecutionScope? BlockScope;
-    
-    // public void SetContext(Context context)
-    // {
-    //     BlockContext = context;
-    // }
-    //
-    // public void SetThread(ExecutionThread? thread)
-    // {
-    //     BlockThread = thread;
-    // }
-    //
-    // public void SetScope(ExecutionScope? scope)
-    // {
-    //     BlockScope = scope;
-    // }
-    //
-    // public ExecutionScope? GetScope()
-    // {
-    //     return BlockScope;
-    // }
-    
-    public virtual void OnShallowCopy()
-    {
-    }
 }

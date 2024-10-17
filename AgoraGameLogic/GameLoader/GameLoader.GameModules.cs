@@ -2,121 +2,171 @@ using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Enums;
 using AgoraGameLogic.Domain.Extensions;
+using AgoraGameLogic.Entities;
 using Newtonsoft.Json.Linq;
 
 namespace AgoraGameLogic.Control.GameLoader;
 
 public partial class GameLoader
 {
-    private List<GameModule> BuildGameModule(Dictionary<GameModule, GameModuleDefinition> gameModulesToDefinition, GameModuleDefinition gameModuleDefinition, StructureDefinition[] structureDefinitions, GameData gameData, GameModule? parent = null)
+    public Result<List<GameModule>> BuildGameModule(
+        Dictionary<GameModule, GameModuleBuildData> gameModulesToDefinition,
+        GameModuleBuildData gameModuleBuildData,
+        StructureBuildData[] structureDefinitions,
+        GameData gameData, 
+        GameModule? parent = null)
     {
-        var structureHierarchy = GameLoaderUtility.GetStructureHierarchy(structureDefinitions, gameModuleDefinition.Structure);
-        var structureHierarchyNames = structureHierarchy.Select(s => s.Name).ToArray();
+        var structureHierarchy = GetStructureHierarchy(structureDefinitions, gameModuleBuildData.Structure);
+        var structureFields = GetStructureFields(structureHierarchy);
+
+        var extendedName = ExtendName(gameModuleBuildData.Name, parent);
+        var names = GetNamesForModule(extendedName, gameModuleBuildData, gameData.NumberOfPlayers);
         
-        // get fields from hierarchy
-        var structureFields = new List<KeyValuePairDefinition>();
-        if (structureHierarchy.Count > 0)
-        {
-            foreach (var structure in structureHierarchy)
-            {
-                structureFields.AddRange(structure.Fields);
-            }
-        }
-        
-        // extend name, if necessary
-        var baseName = gameModuleDefinition.Name;
-        var extendedName = baseName;
-        if (parent != null)
-        {
-            extendedName = $"{parent.Name}_{baseName}";
-        }
-        
-        // add it to the context
-        var names = GameLoaderUtility.GetNamesForGameModule(extendedName, gameModuleDefinition, gameData.NumberOfPlayers);
         var buildGameModules = new List<GameModule>();
+
         foreach (var name in names)
         {
-            var gameModule = new GameModule(name, baseName, gameModuleDefinition.Type, structureHierarchyNames);
+            var gameModule = CreateGameModule(name, gameModuleBuildData, structureHierarchy);
             buildGameModules.Add(gameModule);
 
-            // add to context if global
             if (parent == null)
-            {
                 gameData.GlobalContext.AddOrUpdate(name, ref gameModule);
-            }
-            
-            // add children, and create field reference
-            switch (gameModule.Type)
-            {
-                case GameModuleType.Player:
-                {
-                    var modules = new List<GameModule>();
-                    foreach (var playerModule in gameModuleDefinition.Modules)
-                    {
-                        var result = BuildGameModule(gameModulesToDefinition, playerModule, structureDefinitions, gameData, gameModule);
-                        
-                        // assume player modules are only 1-instance module
-                        var player = result[0];
-                        
-                        modules.Add(player);
-                        gameModulesToDefinition[player] = playerModule;
-                        gameModule.Fields.AddOrUpdate(gameModuleDefinition.Name, ref player);
-                    }
 
-                    var hand = new List<GameModule>();
-                    
-                    gameModule.Fields.AddOrUpdate("Modules", ref modules);
-                    gameModule.Fields.AddOrUpdate("Hand", ref hand);
-                    
-                    break;
-                }
-                case GameModuleType.Deck:
-                {
-                    var cards = new List<GameModule>();
-                    foreach (var cardModule in gameModuleDefinition.Cards)
-                    {
-                        var result = BuildGameModule(gameModulesToDefinition, cardModule, structureDefinitions, gameData, gameModule);
-                        foreach (var r in result)
-                        {
-                            cards.Add(r);
-                            gameModulesToDefinition[r] = cardModule;
-                        }
-                    }
+            HandleModuleType(gameModule, gameModuleBuildData, gameModulesToDefinition, 
+                structureDefinitions, gameData, parent);
 
-                    var numberOfCards = cards.Count;
-                    
-                    gameModule.Fields.AddOrUpdate("Cards", ref cards);
-                    gameModule.Fields.AddOrUpdate("NumberOfCards", ref numberOfCards);
-                    break;
-                }
-                case GameModuleType.Zone:
-                {
-                    var cards = new List<GameModule>();
-                    var numberOfCards = cards.Count();
-                    
-                    gameModule.Fields.AddOrUpdate("Cards", ref cards);
-                    gameModule.Fields.AddOrUpdate("NumberOfCards", ref numberOfCards);
-                    break;
-                }
-            }
-
-            // add gameModuleStructureFields.  Reverse because we want to add older fields first so that they are overwritten
-            var temp = structureFields.ToList();
-            temp.Reverse();
-            foreach (var field in temp)
-            {
-                var value = field.Value;
-                gameModule.Fields.AddOrUpdate(field.Key, ref value);
-            }
-            
-            // add gameModuleFields (after so that it overrides)
-            foreach (var field in gameModuleDefinition.Fields)
-            {
-                var value = field.Value;
-                gameModule.Fields.AddOrUpdate(field.Key, ref value);
-            }
+            AddStructureAndBuildFields(gameModule, structureFields, gameModuleBuildData);
         }
 
-        return buildGameModules;
+        return Result<List<GameModule>>.Success(buildGameModules);
+    }
+
+    private List<StructureBuildData> GetStructureHierarchy(StructureBuildData[] structureDefinitions, string structure)
+    {
+        return GameLoaderUtility.GetStructureHierarchyOrThrow(structureDefinitions, structure);
+    }
+
+    private List<KeyValuePairBuildData> GetStructureFields(List<StructureBuildData> structureHierarchy)
+    {
+        return structureHierarchy.SelectMany(s => s.Fields).ToList();
+    }
+
+    private string ExtendName(string baseName, GameModule? parent)
+    {
+        return parent == null ? baseName : $"{parent.Name}_{baseName}";
+    }
+
+    private string[] GetNamesForModule(string extendedName, GameModuleBuildData gameModuleBuildData, int numberOfPlayers)
+    {
+        return GameLoaderUtility.GetNamesForGameModuleOrThrow(extendedName, gameModuleBuildData, numberOfPlayers).ToArray();
+    }
+
+    private GameModule CreateGameModule(
+        string name, 
+        GameModuleBuildData gameModuleBuildData, 
+        List<StructureBuildData> structureHierarchy) =>
+        new GameModule(name, gameModuleBuildData.Name, gameModuleBuildData.Type, 
+                       structureHierarchy.Select(s => s.Name).ToArray());
+
+    private void HandleModuleType(
+        GameModule gameModule, 
+        GameModuleBuildData gameModuleBuildData, 
+        Dictionary<GameModule, GameModuleBuildData> gameModulesToDefinition, 
+        StructureBuildData[] structureDefinitions, 
+        GameData gameData, 
+        GameModule? parent)
+    {
+        switch (gameModule.Type)
+        {
+            case GameModuleType.Player:
+                HandlePlayerModule(gameModule, gameModuleBuildData, gameModulesToDefinition, structureDefinitions, gameData);
+                break;
+            case GameModuleType.Deck:
+                HandleDeckModule(gameModule, gameModuleBuildData, gameModulesToDefinition, structureDefinitions, gameData);
+                break;
+            case GameModuleType.Zone:
+                HandleZoneModule(gameModule);
+                break;
+        }
+    }
+
+    private void HandlePlayerModule(
+        GameModule gameModule, 
+        GameModuleBuildData gameModuleBuildData, 
+        Dictionary<GameModule, GameModuleBuildData> gameModulesToDefinition, 
+        StructureBuildData[] structureDefinitions, 
+        GameData gameData)
+    {
+        var modules = BuildChildModules(gameModuleBuildData.Modules, gameModulesToDefinition, structureDefinitions, gameData, gameModule);
+
+        var hand = new List<GameModule>();
+        gameModule.Fields.AddOrUpdate("Modules", ref modules);
+        gameModule.Fields.AddOrUpdate("Hand", ref hand);
+    }
+
+    private void HandleDeckModule(
+        GameModule gameModule, 
+        GameModuleBuildData gameModuleBuildData, 
+        Dictionary<GameModule, GameModuleBuildData> gameModulesToDefinition, 
+        StructureBuildData[] structureDefinitions, 
+        GameData gameData)
+    {
+        var cards = BuildChildModules(gameModuleBuildData.Cards, gameModulesToDefinition, structureDefinitions, gameData, gameModule);
+        var numberOfCards = cards.Count;
+        
+        gameModule.Fields.AddOrUpdate("Cards", ref cards);
+        gameModule.Fields.AddOrUpdate("NumberOfCards", ref numberOfCards);
+    }
+
+    private void HandleZoneModule(GameModule gameModule)
+    {
+        var cards = new List<GameModule>();
+        var numberOfCards = cards.Count;
+        gameModule.Fields.AddOrUpdate("Cards", ref cards);
+        gameModule.Fields.AddOrUpdate("NumberOfCards", ref numberOfCards);
+    }
+
+    private List<GameModule> BuildChildModules(
+        GameModuleBuildData[] childModules, 
+        Dictionary<GameModule, GameModuleBuildData> gameModulesToDefinition, 
+        StructureBuildData[] structureDefinitions, 
+        GameData gameData, 
+        GameModule parent)
+    {
+        var modules = new List<GameModule>();
+
+        foreach (var moduleData in childModules)
+        {
+            var result = BuildGameModule(gameModulesToDefinition, moduleData, structureDefinitions, gameData, parent);
+
+            if (!result.IsSuccess)
+                throw new InvalidOperationException(result.Error);
+
+            var module = result.Value[0];
+            modules.Add(module);
+            gameModulesToDefinition[module] = moduleData;
+            parent.Fields.AddOrUpdate(moduleData.Name, ref module);
+        }
+
+        return modules;
+    }
+
+    private void AddStructureAndBuildFields(
+        GameModule gameModule, 
+        List<KeyValuePairBuildData> structureFields, 
+        GameModuleBuildData gameModuleBuildData)
+    {
+        var reversedStructureFields = structureFields.AsEnumerable().Reverse();
+        foreach (var field in reversedStructureFields)
+        {
+            var value = field.Value;
+            gameModule.Fields.AddOrUpdate(field.Key, ref value);
+        }
+
+        foreach (var field in gameModuleBuildData.Fields)
+        {
+            var value = field.Value;
+            gameModule.Fields.AddOrUpdate(field.Key, ref value);
+        }
     }
 }

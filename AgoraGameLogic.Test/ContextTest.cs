@@ -17,7 +17,7 @@ public class ContextTests
 
     #region AddOrUpdate
 
-    [Test, Category(nameof(Context.AddOrUpdate))]
+    [Test, Category(nameof(IContext.AddOrUpdate))]
     [TestCase("value")]
     [TestCase(10)]
     [TestCase(true)]
@@ -34,7 +34,7 @@ public class ContextTests
         Assert.That(result, Is.EqualTo(value));
     }
 
-    [Test, Category(nameof(Context.AddOrUpdate))]
+    [Test, Category(nameof(IContext.AddOrUpdate))]
     public void AddOrUpdate_WithComplexType_WithCorrespondingTypeT_AddValue()
     {
         // Arrange
@@ -49,7 +49,7 @@ public class ContextTests
         Assert.That(result.Id, Is.EqualTo("AnId"));
     }
     
-    [Test, Category(nameof(Context.AddOrUpdate))]
+    [Test, Category(nameof(IContext.AddOrUpdate))]
     public void AddOrUpdate_WithComplexType_WithObjectTypeT_AddValue()
     {
         // Arrange
@@ -64,7 +64,7 @@ public class ContextTests
         Assert.That(result.Id, Is.EqualTo("AnId"));
     }
 
-    [Test, Category(nameof(Context.AddOrUpdate))]
+    [Test, Category(nameof(IContext.AddOrUpdate))]
     public void AddOrUpdate_WhenKeyExists_ShouldUpdateRefValue()
     {
         // Arrange
@@ -85,7 +85,7 @@ public class ContextTests
 
     #region Get
 
-    [Test, Category(nameof(Context.Get))]
+    [Test, Category(nameof(IContext.Get))]
     public void Get_ShouldReturnStoredValue_WhenKeyExistsAndTypeIsCorrect()
     {
         // Arrange
@@ -100,7 +100,7 @@ public class ContextTests
         Assert.That(result, Is.EqualTo(storedValue));
     }
     
-    [Test, Category(nameof(Context.Get))]
+    [Test, Category(nameof(IContext.Get))]
     public void Get_ShouldThrowException_WhenKeyExistsButTypeIsIncorrect()
     {
         // Arrange
@@ -112,7 +112,7 @@ public class ContextTests
         var ex = Assert.Throws<Exception>(() => _context.Get<int>(key));
     }
     
-    [Test, Category(nameof(Context.Get))]
+    [Test, Category(nameof(IContext.Get))]
     public void Get_ShouldThrowException_WhenKeyDoesNotExist()
     {
         // Arrange
@@ -122,7 +122,7 @@ public class ContextTests
         Assert.Throws<Exception>(() => _context.Get<int>(key));
     }
     
-    [Test, Category(nameof(Context.Get))]
+    [Test, Category(nameof(IContext.Get))]
     public void Get_ShouldHandleComplexType_WithCorrectType()
     {
         // Arrange
@@ -137,7 +137,7 @@ public class ContextTests
         Assert.That(result.Id, Is.EqualTo("StoredId"));
     }
 
-    [Test, Category(nameof(Context.Get))]
+    [Test, Category(nameof(IContext.Get))]
     public void Get_ShouldReturnPrimitiveValue_WhenKeyExistsWithCorrectType()
     {
         // Arrange
@@ -152,7 +152,7 @@ public class ContextTests
         Assert.That(result, Is.EqualTo(42));
     }
 
-    [Test, Category(nameof(Context.Get))]
+    [Test, Category(nameof(IContext.Get))]
     public void Get_ShouldThrowException_WhenTypeDoesNotMatchWithPrimitiveValue()
     {
         // Arrange
@@ -164,7 +164,7 @@ public class ContextTests
         var ex = Assert.Throws<Exception>(() => _context.Get<string>(key));
     }
     
-    [Test, Category(nameof(Context.Get))]
+    [Test, Category(nameof(IContext.Get))]
     public void Get_ShouldReturnValue_WhenKeyExistsAndRequestedAsObject()
     {
         // Arrange
@@ -184,7 +184,7 @@ public class ContextTests
 
     #region GetOrDefault
 
-    [Test, Category(nameof(Context.GetOrDefault))]
+    [Test, Category(nameof(IContext.GetOrDefault))]
     public void GetOrDefault_WhenKeyDoesNotExist_ShouldReturnDefaultValue()
     {
         // Arrange
@@ -198,7 +198,7 @@ public class ContextTests
         Assert.That(result, Is.EqualTo(defaultValue));
     }
 
-    [Test, Category(nameof(Context.GetOrDefault))]
+    [Test, Category(nameof(IContext.GetOrDefault))]
     public void GetOrDefault_ShouldReturnStoredValue_WhenKeyExistsWithCorrectType()
     {
         // Arrange
@@ -213,7 +213,7 @@ public class ContextTests
         Assert.That(result, Is.EqualTo(storedValue));
     }
 
-    [Test, Category(nameof(Context.GetOrDefault))]
+    [Test, Category(nameof(IContext.GetOrDefault))]
     public void GetOrDefault_ShouldReturnDefaultValue_WhenKeyExistsButTypeMismatch()
     {
         // Arrange
@@ -228,7 +228,7 @@ public class ContextTests
         Assert.That(result, Is.EqualTo("default string"));  // Should return default value, since type mismatch
     }
 
-    [Test, Category(nameof(Context.GetOrDefault))]
+    [Test, Category(nameof(IContext.GetOrDefault))]
     public void GetOrDefault_ShouldHandleComplexType()
     {
         // Arrange
@@ -242,6 +242,79 @@ public class ContextTests
 
         // Assert
         Assert.That(result, Is.EqualTo(storedValue));
+    }
+
+    #endregion
+
+    #region Copy
+
+    [Test, Category(nameof(IContext.Copy))]
+    public void Copy_ShouldContainSameKeysAndValues()
+    {
+        // Arrange
+        var intValue = 42;
+        var stringValue = "Hello";
+        _context.AddOrUpdate("intKey", ref intValue);
+        _context.AddOrUpdate("stringKey", ref stringValue);
+
+        // Act
+        var copiedContext = (Context)_context.Copy();
+
+        // Assert
+        Assert.That(copiedContext.Get<int>("intKey"), Is.EqualTo(42));
+        Assert.That(copiedContext.Get<string>("stringKey"), Is.EqualTo("Hello"));
+    }
+
+    [Test, Category(nameof(IContext.Copy))]
+    public void Copy_WhenOriginalEntriesAreModified_shouldReflectOnOriginal()
+    {
+        // Arrange
+        var intValue = 10;
+        _context.AddOrUpdate("key", ref intValue);
+        var copiedContext = (Context)_context.Copy();
+
+        // Act
+        var newValue = 20;
+        copiedContext.AddOrUpdate("key", ref newValue);
+
+        // Assert
+        Assert.That(_context.Get<int>("key"), Is.EqualTo(20));  // Original context should have updated value
+        Assert.That(copiedContext.Get<int>("key"), Is.EqualTo(20));
+    }
+    
+    [Test, Category(nameof(IContext.Copy))]
+    public void Copy_WhenNewEntriesAreAdded_shouldNotReflectOnOriginal()
+    {
+        // Arrange
+        var intValue = 10;
+        _context.AddOrUpdate("key", ref intValue);
+        var copiedContext = (Context)_context.Copy();
+
+        // Act
+        var newValue = 20;
+        copiedContext.AddOrUpdate("anotherKey", ref newValue);
+
+        // Assert
+        Assert.That(_context.Get<int>("key"), Is.EqualTo(10));
+        Assert.Throws<Exception>(() => _context.Get<int>("anotherKey")); // new keys should not be added to original context
+        Assert.That(copiedContext.Get<int>("anotherKey"), Is.EqualTo(20));
+    }
+    
+
+    [Test, Category(nameof(IContext.Copy))]
+    public void Copy_ShouldRetainReferenceForComplexObjects()
+    {
+        // Arrange
+        var complexObject = new GameModule("AnId", "AName", GameModuleType.Player, Array.Empty<string>());
+        _context.AddOrUpdate("complexKey", ref complexObject);
+        var copiedContext = (Context)_context.Copy();
+
+        // Act
+        var copiedComplexObject = copiedContext.Get<GameModule>("complexKey");
+        copiedComplexObject.Name = "AnotherName";  // Modify the copied complex object
+
+        // Assert
+        Assert.That(_context.Get<GameModule>("complexKey").Name, Is.EqualTo("AnotherName"));  // Should reflect in original context
     }
 
     #endregion

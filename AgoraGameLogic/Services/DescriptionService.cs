@@ -4,6 +4,7 @@ using AgoraGameLogic.Domain.Entities.DataObject;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Extensions;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 using AgoraGameLogic.Logic;
 using AgoraGameLogic.Logic.Blocks;
 using Newtonsoft.Json;
@@ -11,7 +12,7 @@ using Newtonsoft.Json.Linq;
 
 namespace AgoraGameLogic.Control.Services;
 
-public class DescriptionService
+public class DescriptionService : IDescriptionService
 {
     private Dictionary<GameModule,  List<object>> _description = new Dictionary<GameModule,  List<object>>();
     private List<GameModule> _players = new List<GameModule>();
@@ -21,90 +22,131 @@ public class DescriptionService
         _players = players.ToList();
     }
     
-    public void RegisterDescription(GameModule gameModule, JArray descriptionJArray, GameData gameData)
+    public Result RegisterDescriptionJArray(GameModule gameModule, JArray descriptionJArray, GameData gameData)
     {
-        var segment = new List<object>();
-        foreach (var descriptionJToken in descriptionJArray)
+        try
         {
-            if (descriptionJToken.Type == JTokenType.String)
+            var segment = new List<object>();
+
+            // iterate over all jToken inside jArray
+            foreach (var descriptionJToken in descriptionJArray)
             {
-                segment.Add(descriptionJToken.ToString());
-            } 
-            else
-            {
-                try
+                if (descriptionJToken.Type == JTokenType.String)
                 {
-                    if (descriptionJToken.HasValues)
+                    // append string part (constant)
+                    segment.Add(descriptionJToken.ToString());
+                }
+                else if (descriptionJToken.HasValues)
+                {
+                    // append block part (variable)
+                    var valueBlockResult = BlockFactory.Create<ValueBlockBase>(descriptionJToken, gameData);
+                    if (!valueBlockResult.IsSuccess)
                     {
-                        var valueBlock = BlockFactory.Create<ValueBlockBase>(descriptionJToken, gameData);
-                        segment.Add(valueBlock);
+                        return Result.Failure(valueBlockResult.Error);
                     }
-                }
-                catch (JsonReaderException ex)
-                {
-                    Console.WriteLine($"Failed to parse logic block: {ex.Message}");
+
+                    segment.Add(valueBlockResult.Value);
                 }
             }
-        }
 
-        // Save the parsed description
-        _description[gameModule] = segment;
-    }
-    
-    public Dictionary<string, DescriptionDto[]> GetDescriptionDtos(IContext globalContext)
-    {
-        // iterate over each player
-        var result = new Dictionary<string, DescriptionDto[]>();
-        for (var i = 0; i < _players.Count(); i++)
+            // Save the parsed description
+            _description[gameModule] = segment;
+
+            return Result.Success();
+        }
+        catch (JsonReaderException ex)
         {
-            var player = _players[i];
-            var contextCopy = globalContext.Copy();
-            contextCopy.AddOrUpdate("p", ref player);
-            
-            // build description for each gm w.r.t the player
-            var resolvedDescriptions = new List<DescriptionDto>();
-            foreach (var entry in _description)
+            return Result.Failure($"Failed to parse logic block: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Unexpected error: {ex.Message}");
+        }
+    }
+
+    public Result<Dictionary<string, DescriptionDto[]>> GetDescriptionDtos(IContext globalContext)
+    {
+        try
+        {
+            var result = new Dictionary<string, DescriptionDto[]>();
+
+            // Iterate over each player
+            for (var i = 0; i < _players.Count(); i++)
             {
-                var gameModule = entry.Key;
-                contextCopy.AddOrUpdate("this", ref gameModule);
-                
-                var resolvedDescription = new DescriptionDto()
+                var player = _players[i];
+                var contextCopy = globalContext.Copy();
+                contextCopy.AddOrUpdate("p", ref player);
+
+                // Build description for each game module with respect to the player
+                var resolvedDescriptions = new List<DescriptionDto>();
+                foreach (var entry in _description)
                 {
-                    Name = entry.Key.Name,
-                    Text = ResolveDescription(entry.Value, contextCopy)
-                };
-            
-                resolvedDescriptions.Add(resolvedDescription);
+                    // add 'this' to context
+                    var gameModule = entry.Key;
+                    contextCopy.AddOrUpdate("this", ref gameModule);
+
+                    // resolve description
+                    var resolvedTextResult = ResolveDescription(entry.Value, contextCopy);
+                    if (!resolvedTextResult.IsSuccess)
+                    {
+                        return Result<Dictionary<string, DescriptionDto[]>>.Failure(resolvedTextResult.Error);
+                    }
+
+                    // build description dto
+                    var resolvedDescription = new DescriptionDto
+                    {
+                        Name = gameModule.Name,
+                        Text = resolvedTextResult.Value
+                    };
+
+                    resolvedDescriptions.Add(resolvedDescription);
+                }
+
+                // update result with descriptions
+                result[player.Name] = resolvedDescriptions.ToArray();
             }
 
-            result[player.Name] = resolvedDescriptions.ToArray();
+            return Result<Dictionary<string, DescriptionDto[]>>.Success(result);
         }
-
-        return result;
-    }
-    
-    private string ResolveDescription(List<object> segments, IContext context)
-    {
-        var resolvedDescription = new StringBuilder();
-        foreach (var segment in segments)
+        catch (Exception ex)
         {
-            if (segment is string textSegment)
-            {
-                resolvedDescription.Append(textSegment);
-            }
-            else if (segment is ValueBlockBase valueBlock)
-            {
-                // Resolve the logic block (using provided function to resolve the block)
-                var value = valueBlock.GetValue<object>(context);
-                resolvedDescription.Append(JsonConvert.SerializeObject(value));
-            }
-            else
-            {
-                throw new Exception("segment is not supported");
-            }
+            return Result<Dictionary<string, DescriptionDto[]>>.Failure($"Unexpected error: {ex.Message}");
         }
-
-        return resolvedDescription.ToString();
     }
 
+    
+    public Result<string> ResolveDescription(List<object> segments, IContext context)
+    {
+        try
+        {
+            var resolvedDescription = new StringBuilder();
+
+            // Build description by adding each part together
+            foreach (var segment in segments)
+            {
+                if (segment is string textSegment)
+                {
+                    // Append string segment
+                    resolvedDescription.Append(textSegment);
+                }
+                else if (segment is ValueBlockBase valueBlock)
+                {
+                    // Resolve the value block
+                    var value = valueBlock.GetValue<object>(context);
+                    resolvedDescription.Append(JsonConvert.SerializeObject(value));
+                }
+                else
+                {
+                    return Result<string>.Failure("Segment type is not supported.");
+                }
+            }
+
+            // Return success with the built string
+            return Result<string>.Success(resolvedDescription.ToString());
+        }
+        catch (Exception ex)
+        {
+            return Result<string>.Failure($"Error resolving description: {ex.Message}");
+        }
+    }
 }

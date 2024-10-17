@@ -3,6 +3,7 @@ using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Entities.Utility;
 using AgoraGameLogic.Domain.Extensions;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 
 namespace AgoraGameLogic.Logic.Blocks.Controls;
 
@@ -12,26 +13,38 @@ public class ForeachBlock : StatementBlockBase
     private Value<IEnumerable<object>> _enumerable;
     private StatementBlockBase[] _loopBranch;
     
-    public ForeachBlock(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public ForeachBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        _key = Value<string>.Parse(definition.Inputs[0], gameData);
-        _enumerable = Value<IEnumerable<object>>.Parse(definition.Inputs[1], gameData);
-        _loopBranch = BlockFactory.CreateArray<StatementBlockBase>(definition.Inputs[2].AsValidArray(), gameData);
+        _key = Value<string>.ParseOrThrow(buildData.Inputs[0], gameData);
+        _enumerable = Value<IEnumerable<object>>.ParseOrThrow(buildData.Inputs[1], gameData);
+        _loopBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[2].AsValidArray(), gameData);
     }
 
-    public override async Task ExecuteAsync(IContext context, Scope? scope)
+    public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
     {
-        var key = _key.GetValue(context);
-        var enumerable = _enumerable.GetValue(context).ToList();
-        
-        for (var i = 0; i < enumerable.Count(); i++)
+        try
         {
-            var contextCopy = context.Copy();
-            var item = enumerable[i];
+            var key = _key.GetValueOrThrow(context);
+            var enumerable = _enumerable.GetValueOrThrow(context).ToList();
+
+            for (var i = 0; i < enumerable.Count(); i++)
+            {
+                var contextCopy = context.Copy();
+                var item = enumerable[i];
+
+                contextCopy.AddOrUpdate(key, ref item);
+
+                await ExecuteSequenceOrThrowAsync(_loopBranch, context, scope);
+            }
             
-            contextCopy.AddOrUpdate(key, ref item);
-            
-            await ExecuteSequenceAsync(_loopBranch, context, scope);
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message, new ErrorBuilder()
+            {
+                Scope = Scope
+            });
         }
     }
 }

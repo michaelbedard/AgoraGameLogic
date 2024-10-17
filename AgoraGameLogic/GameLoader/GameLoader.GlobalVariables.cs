@@ -2,59 +2,76 @@ using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Entities.Utility;
 using AgoraGameLogic.Domain.Extensions;
+using AgoraGameLogic.Entities;
 using Newtonsoft.Json.Linq;
 
 namespace AgoraGameLogic.Control.GameLoader;
 
 public partial class GameLoader
 {
-    public void AddGlobalVariableToContext(Context context, KeyValuePairDefinition keyValuePairDefinition)
+    public Result AddGlobalVariableToContext(Context context, KeyValuePairBuildData keyValuePairBuildData)
     {
         object? value;
         
-        if (keyValuePairDefinition.Value.Type == JTokenType.Null)
+        if (keyValuePairBuildData.Value.Type == JTokenType.Null)
         {
+            // value is null
             value = null;
         }
-        else if (keyValuePairDefinition.Value.Type == JTokenType.Integer)
+        else if (keyValuePairBuildData.Value.Type == JTokenType.Integer)
         {
-            value = keyValuePairDefinition.Value.ToObject<int>();
+            // values is an int
+            value = keyValuePairBuildData.Value.ToObject<int>();
         }
-        else if (keyValuePairDefinition.Value.Type == JTokenType.String)
+        else if (keyValuePairBuildData.Value.Type == JTokenType.String)
         {
-            value = keyValuePairDefinition.Value.ToObject<string>();
+            // value is a string
+            value = keyValuePairBuildData.Value.ToObject<string>();
         }
-        else if (keyValuePairDefinition.Value.Type == JTokenType.Array && keyValuePairDefinition.Value.First != null)
+        else if (keyValuePairBuildData.Value.Type == JTokenType.Array && keyValuePairBuildData.Value.First != null)
         {
-            var firstItemType = keyValuePairDefinition.Value.First.Type;
-
-            // Check if it's an array of integers or strings
+            // value is an array.  Check if it's an array of integers or strings
+            var firstItemType = keyValuePairBuildData.Value.First.Type;
             if (firstItemType == JTokenType.Integer)
             {
-                value = keyValuePairDefinition.Value.ToObject<int[]>();
+                // value is int[]
+                value = keyValuePairBuildData.Value.ToObject<int[]>();
             }
             else if (firstItemType == JTokenType.String)
             {
-                value = keyValuePairDefinition.Value.ToObject<string[]>();
+                // value is string[]
+                value = keyValuePairBuildData.Value.ToObject<string[]>();
             }
             else
             {
-                throw new InvalidOperationException("Unsupported array element type in 'Value'.");
+                return Result.Failure("Unsupported array element type in 'Value'");
             }
         }
         else
         {
-            throw new InvalidOperationException("Unsupported type in 'Value'.");
+            return Result.Failure("Unsupported type in 'Value'");
         }
 
-        var valueObject = Value<object?>.From(value);
-        context.AddOrUpdate(keyValuePairDefinition.Key, ref valueObject);
+        var valueObject = Value<object?>.FromOrThrow(value);
+        context.AddOrUpdate(keyValuePairBuildData.Key, ref valueObject);
+        
+        return Result.Success();
     }
 
-    public void AddBuiltInGlobalVariableToContext(Context context, IEnumerable<GameModule> players)
+    public Result AddBuiltInGlobalVariableToContext(Context context, IEnumerable<GameModule> players)
     {
-        // players
-        var playerList = players.ToList();
-        context.AddOrUpdate("Players", ref playerList);
+        try
+        {
+            // players
+            var playerList = players.ToList();
+            context.AddOrUpdate("Players", ref playerList);
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message);
+        }
+        
     }
 }

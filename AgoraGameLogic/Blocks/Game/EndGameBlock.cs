@@ -3,6 +3,7 @@ using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Entities.Utility;
 using AgoraGameLogic.Domain.Enums;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 
 namespace AgoraGameLogic.Logic.Blocks.Game;
 
@@ -10,41 +11,52 @@ public class EndGameBlock : StatementBlockBase
 {
     private Value<EndGameMethod> _method;
     
-    public EndGameBlock(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public EndGameBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        _method = Value<EndGameMethod>.Parse(definition.Inputs[0], gameData);
+        _method = Value<EndGameMethod>.ParseOrThrow(buildData.Inputs[0], gameData);
     }
 
-    public override async Task ExecuteAsync(IContext context, Scope? scope)
+    public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
     {
-        var method = _method.GetValue(context);
-        GameModule[] winners;
-        object[] args;
-
-        switch (method)
+        try
         {
-            case EndGameMethod.LeastCardsInHand:
+            GameModule[] winners;
+            object[] args;
+
+            var method = _method.GetValueOrThrow(context);
+            switch (method)
             {
-                winners = Players.OrderBy(p => p.Fields.Get<List<GameModule>>("Hand").Count).ToArray();
-                args = winners.Select(p => (object)p.Fields.Get<List<GameModule>>("Hand").Count).ToArray();;
-                break;
+                case EndGameMethod.LeastCardsInHand:
+                {
+                    winners = Players.OrderBy(p => p.Fields.Get<List<GameModule>>("Hand").Count).ToArray();
+                    args = winners.Select(p => (object)p.Fields.Get<List<GameModule>>("Hand").Count).ToArray();
+                    ;
+                    break;
+                }
+                case EndGameMethod.LeastPoints:
+                {
+                    throw new Exception();
+                    break;
+                }
+                case EndGameMethod.MostPoints:
+                {
+                    throw new Exception();
+                    break;
+                }
+                default:
+                {
+                    throw new Exception();
+                }
             }
-            case EndGameMethod.LeastPoints:
-            {
-                throw new Exception();
-                break;
-            }
-            case EndGameMethod.MostPoints:
-            {
-                throw new Exception();
-                break;
-            }
-            default:
-            {
-                throw new Exception();
-            }
+
+            // TODO
+            // EndGame(method, winners, args);
+            
+            return Result.Success();
         }
-        
-        // EndGame(method, winners, args);
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message);
+        }
     }
 }

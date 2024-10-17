@@ -2,19 +2,20 @@ using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Extensions;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 
 namespace AgoraGameLogic.Logic.Blocks.Turns;
 
 public class TurnByTurnBlock : TurnBlockBlockBase
 {
-    public TurnByTurnBlock(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public TurnByTurnBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        StartBranch = BlockFactory.CreateArray<StatementBlockBase>(definition.Inputs[0].AsValidArray(), gameData);
-        UpdateBranch = BlockFactory.CreateArray<StatementBlockBase>(definition.Inputs[1].AsValidArray(), gameData);
-        EndBranch = BlockFactory.CreateArray<StatementBlockBase>(definition.Inputs[2].AsValidArray(), gameData);
+        StartBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[0].AsValidArray(), gameData);
+        UpdateBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[1].AsValidArray(), gameData);
+        EndBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[2].AsValidArray(), gameData);
     }
 
-    public override async Task ExecuteAsync(IContext context, Scope? scope)
+    public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
     {
         foreach (var player in Players)
         {
@@ -22,13 +23,16 @@ public class TurnByTurnBlock : TurnBlockBlockBase
             context.AddOrUpdate("player", ref currentPlayer);
             
             // start
-            await ExecuteStart(context, player);
-            
-            // update
-            await ExecuteUpdate(context, player);
-            
-            // end
-            await ExecuteEnd(context, player);
+            var executionResult = await ExecuteStart(context, player)
+                .ThenAsync(async () => await ExecuteUpdate(context, player))
+                .ThenAsync(async () => await ExecuteEnd(context, player));
+
+            if (!executionResult.IsSuccess)
+            {
+                return Result.Failure(executionResult.Error);
+            }
         }
+        
+        return Result.Success();
     }
 }

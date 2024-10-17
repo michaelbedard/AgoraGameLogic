@@ -1,18 +1,19 @@
 using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 
 namespace AgoraGameLogic.Logic.Blocks;
 
 public abstract class ValueBlockBase : BlockBase
 {
-    protected ValueBlockBase(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    protected ValueBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
     }
     
-    public abstract T GetValue<T>(IContext context);
+    public abstract Result<T> GetValue<T>(IContext context);
 
-    public object GetValue(IContext context)
+    public Result<object> GetValue(IContext context)
     {
         return GetValue<object>(context);
     }

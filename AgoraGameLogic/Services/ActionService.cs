@@ -1,16 +1,33 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 
 namespace AgoraGameLogic.Control.Services;
 
-public class ActionService : CommandService<ActionCommandBase>
+public class ActionService : CommandService<ActionCommand>, IActionService
 {
-    public async void PerformAction(IContext context, string playerName, int id)
+    public async Task<Result> PerformActionAsync(IContext context, string playerName, int id)
     {
-        var command = GetCommand(playerName, id);
-        
-        RemoveCommand(id);
-        await command.PerformAsync(context, true);
+        try
+        {
+            var commandResult = GetCommand(playerName, id);
+            if (!commandResult.IsSuccess)
+            {
+                return Result.Failure(commandResult.Error);
+            }
+
+            var removeResult = RemoveCommand(id);
+            if (!removeResult.IsSuccess)
+            {
+                return Result.Failure(removeResult.Error);
+            }
+
+            var performResult = await commandResult.Value.PerformAsync(context, true);
+            return performResult.IsSuccess ? Result.Success() : Result.Failure(performResult.Error);
+        }
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message);
+        }
     }
 }

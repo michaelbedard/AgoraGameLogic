@@ -4,7 +4,7 @@ namespace AgoraGameLogic.Logic.Blocks;
 
 public class OptionBlockBase : BlockBase
 {
-    public OptionBlockBase(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public OptionBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
     }
 }

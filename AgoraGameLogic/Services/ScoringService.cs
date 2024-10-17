@@ -1,10 +1,11 @@
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 using AgoraGameLogic.Logic.Rules;
 
 namespace AgoraGameLogic.Control.Services;
 
-public class ScoringService
+public class ScoringService : IScoringService
 {
     private Dictionary<string, ScoringRuleStore> _scoringRuleStoreByTag = new Dictionary<string, ScoringRuleStore>();
     private IContext? _globalContext;
@@ -14,51 +15,105 @@ public class ScoringService
         _globalContext = context;
     }
     
-    public void RegisterRule(string tag, ScoringRule rule)
+    /// <summary>
+    /// Registers a scoring rule under a specific tag.
+    /// </summary>
+    public Result RegisterRule(string tag, ScoringRule rule)
     {
-        if (!_scoringRuleStoreByTag.ContainsKey(tag))
+        try
         {
-            _scoringRuleStoreByTag[tag] = new ScoringRuleStore();
+            if (!_scoringRuleStoreByTag.ContainsKey(tag))
+            {
+                _scoringRuleStoreByTag[tag] = new ScoringRuleStore();
+            }
+
+            _scoringRuleStoreByTag[tag].AddRule(rule);
+            return Result.Success();
         }
-        
-        _scoringRuleStoreByTag[tag].AddRule(rule);
+        catch (Exception ex)
+        {
+            return Result.Failure($"Failed to register rule: {ex.Message}");
+        }
     }
 
-    public int GetScore(GameModule player)
+    /// <summary>
+    /// Gets the total score for a player across all tags.
+    /// </summary>
+    public Result<int> GetScoreForPlayer(GameModule player)
     {
-        var score = 0;
-        foreach (var tag in _scoringRuleStoreByTag.Keys)
+        try
         {
-            score += GetScoreForTag(player, tag);
-        }
+            var totalScore = 0;
 
-        return score;
+            // foreach tags
+            foreach (var tag in _scoringRuleStoreByTag.Keys)
+            {
+                // get score
+                var tagScoreResult = GetScoreForPlayerForTag(player, tag);
+                if (!tagScoreResult.IsSuccess)
+                {
+                    return Result<int>.Failure(tagScoreResult.Error);
+                }
+
+                // add to total
+                totalScore += tagScoreResult.Value;
+            }
+
+            return Result<int>.Success(totalScore);
+        }
+        catch (Exception ex)
+        {
+            return Result<int>.Failure($"Error calculating score: {ex.Message}");
+        }
     }
     
-    public int GetScoreForTag(GameModule player, string tag)
+    /// <summary>
+    /// Gets the score for a player for a specific tag.
+    /// </summary>
+    public Result<int> GetScoreForPlayerForTag(GameModule player, string tag)
     {
         if (_globalContext == null)
         {
-            throw new Exception("Global context not set yet inside scoring service");
+            return Result<int>.Failure("Global context is not set.");
         }
-        
-        if (_scoringRuleStoreByTag.TryGetValue(tag, out var scoringRuleStore))
+
+        if (!_scoringRuleStoreByTag.TryGetValue(tag, out var scoringRuleStore))
+        {
+            return Result<int>.Failure($"No rules found for tag '{tag}'.");
+        }
+
+        try
         {
             var score = 0;
+
+            // for each registered rule
             foreach (var scoringRule in scoringRuleStore.GetRules())
             {
+                // add 'player' to context
                 var contextCopy = _globalContext.Copy();
                 contextCopy.AddOrUpdate("Player", ref player);
                 
-                score += scoringRule.ResolveScore(contextCopy, player);
+                // resolve and add score
+                var resolvedScoreResult = scoringRule.ResolveScore(contextCopy, player);
+                if (!resolvedScoreResult.IsSuccess)
+                {
+                    return Result<int>.Failure(resolvedScoreResult.Error);
+                }
+                
+                score += resolvedScoreResult.Value;
             }
 
-            return score;
+            return Result<int>.Success(score);
         }
-
-        throw new Exception($"No rules for tag {tag}");
+        catch (Exception ex)
+        {
+            return Result<int>.Failure($"Error resolving score for tag '{tag}': {ex.Message}");
+        }
     }
     
+    /// <summary>
+    /// A private class for managing scoring rules
+    /// </summary>
     private class ScoringRuleStore
     {
         private readonly List<ScoringRule> _scoringRules;

@@ -3,6 +3,7 @@ using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Enums;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 
 namespace AgoraGameLogic.Logic.Blocks;
 
@@ -17,11 +18,11 @@ public abstract class BlockBase
     protected IEnumerable<GameModule> Players;
     
 
-    public BlockBase(BlockDefinition definition, GameData gameData)
+    public BlockBase(BlockBuildData buildData, GameData gameData)
     {
         _scoringService = gameData.ScoringService;
         
-        Options = BlockFactory.CreateArray<OptionBlockBase>(definition.Options, gameData);
+        Options = BlockFactory.CreateArrayOrThrow<OptionBlockBase>(buildData.Options, gameData);
         Players = gameData.Players;
     }
     
@@ -32,35 +33,67 @@ public abstract class BlockBase
         return Options.Any(option => option is T);
     }
 
-    public IEnumerable<T> GetOptions<T>() where T : OptionBlockBase
+    public IEnumerable<T> GetOptionsOrThrow<T>() where T : OptionBlockBase
     {
         return Options.OfType<T>();
     }
     
-    public T GetOption<T>() where T : OptionBlockBase
+    public T GetOptionOrThrow<T>() where T : OptionBlockBase
     {
-        return GetOptions<T>().ToList()[0];
+        var options = GetOptionsOrThrow<T>();
+        if (options.Count() == 0)
+        {
+            throw new Exception($"block has option {typeof(T)}");
+        }
+        return GetOptionsOrThrow<T>().ToList()[0];
     }
     
     // SCORING
     
-    protected int GetScore(GameModule player)
+    protected int GetScoreOrThrow(GameModule player)
     {
-        return _scoringService.GetScore(player);
+        var scoreResult = _scoringService.GetScoreForPlayer(player);
+        if (!scoreResult.IsSuccess)
+        {
+            throw new Exception(scoreResult.Error);
+        }
+
+        return scoreResult.Value;
     }
     
-    protected int GetScore(GameModule player, string tag)
+    protected int GetScoreOrThrow(GameModule player, string tag)
     {
-        return _scoringService.GetScoreForTag(player, tag);
+        var scoreResult = _scoringService.GetScoreForPlayerForTag(player, tag);
+        if (!scoreResult.IsSuccess)
+        {
+            throw new Exception(scoreResult.Error);
+        }
+
+        return scoreResult.Value;
     }
     
     // SEQUENCE
     
-    protected async Task ExecuteSequenceAsync(StatementBlockBase[] blocks, IContext context, Scope? scope)
+    protected async Task<Result> ExecuteSequenceAsync(StatementBlockBase[] blocks, IContext context, Scope? scope)
     {
         foreach (var block in blocks)
         {
-            await block.ExecuteAsync(context, scope);
+            var executeResult = await block.ExecuteAsync(context, scope);
+            if (!executeResult.IsSuccess)
+            {
+                return Result.Failure(executeResult.Error);
+            }
+        }
+        
+        return Result.Success();
+    }
+    
+    protected async Task ExecuteSequenceOrThrowAsync(StatementBlockBase[] blocks, IContext context, Scope? scope)
+    {
+        var executeSequenceResult = await ExecuteSequenceAsync(blocks, context, scope);
+        if (!executeSequenceResult.IsSuccess)
+        {
+            throw new Exception(executeSequenceResult.Error);
         }
     }
 }

@@ -1,13 +1,20 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1997EB81_002D38A6_002D4F2E_002D961C_002D0F7FD7693128_002Ff_003ATestBuild_002Ejson/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1997EB81_002D38A6_002D4F2E_002D961C_002D0F7FD7693128_002Ff_003AUnoBuild_002Ejson/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/ActualSeverity/@EntryValue">WARNING</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a17198d8_002D249c_002D4077_002Dabd5_002D50e52a219ff9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests in category 'AddOrUpdate'" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::F8BE7009-3283-49D2-9218-269DF0D8D7FB::net8.0::AgoraGameLogic.Test.ContextTests&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a17198d8_002D249c_002D4077_002Dabd5_002D50e52a219ff9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests in category 'AddOrUpdate'" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;TestAncestor&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::F8BE7009-3283-49D2-9218-269DF0D8D7FB::net8.0::AgoraGameLogic.Test.ContextTests&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::F8BE7009-3283-49D2-9218-269DF0D8D7FB::net8.0::AgoraGameLogic.Test.BlockFactoryTests.Create_WithJTokenAndWithSpecifiedType_WithValidInput_ReturnsSuccess&lt;/TestId&gt;&#xD;
+      &lt;TestId&gt;NUnit3x::F8BE7009-3283-49D2-9218-269DF0D8D7FB::net8.0::AgoraGameLogic.Test.BlockBuildDataTests.Parse_ValidToken_ReturnsSuccess&lt;/TestId&gt;&#xD;
+    &lt;/TestAncestor&gt;&#xD;
+    &lt;Category&gt;Parse&lt;/Category&gt;&#xD;
+  &lt;/Or&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e202ae68_002De0f0_002D4c0c_002Da31c_002D58f045947bf3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="ContextTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e202ae68_002De0f0_002D4c0c_002Da31c_002D58f045947bf3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="ContextTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::F8BE7009-3283-49D2-9218-269DF0D8D7FB::net8.0::AgoraGameLogic.Test.ContextTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::F8BE7009-3283-49D2-9218-269DF0D8D7FB::net8.0::AgoraGameLogic.Test.BlockFactoryTests.Create_WithJTokenAndWithSpecifiedType_WithValidInput_ReturnsSuccess&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

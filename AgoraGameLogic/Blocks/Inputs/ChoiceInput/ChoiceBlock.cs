@@ -1,4 +1,3 @@
-using AgoraGameLogic.Core.Entities.Utility;
 using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Entities.Utility;
@@ -6,34 +5,30 @@ using AgoraGameLogic.Domain.Interfaces;
 
 namespace AgoraGameLogic.Logic.Blocks.Inputs;
 
-public class ChoiceBlock : InputBlockBase<Choice, ChoiceBlock>
+public class ChoiceBlock : InputBlockBase<ChoiceCommand, ChoiceBlock, OnChoiceBlock>
 {
-    private Value<GameModule> _player;
+    private Value<GameModule> _target;
     private Value<object[]> _choices;
     
-    public ChoiceBlock(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public ChoiceBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        _player = Value<GameModule>.Parse(definition.Inputs[0], gameData);
-        _choices = Value<object[]>.Parse(definition.Inputs[1], gameData);
+        _target = Value<GameModule>.ParseOrThrow(buildData.Inputs[0], gameData);
+        _choices = Value<object[]>.ParseOrThrow(buildData.Inputs[1], gameData);
     }
 
-    public override Choice GetCommand(IContext context)
+    public override ChoiceCommand GetCommandOrThrow(IContext context)
     {
-        var player = _player.GetValue(context);
-        var choices = _choices.GetValue(context);
+        var target = _target.GetValueOrThrow(context);
+        var choices = _choices.GetValueOrThrow(context);
         
         var options = new Dictionary<string, object>();
 
-        return new Choice(this, Scope)
+        return new ChoiceCommand(this, Scope)
         {
-            Player = player,
+            Target = target,
             Choices = choices,
+            AnswerIndex = -1,
             Options = options,
         };
-    }
-
-    protected override void CompletePendingRequest(PendingRequest<InputCommandBase> pendingRequest, Choice command)
-    {
-        pendingRequest.For(command.Player);
     }
 }

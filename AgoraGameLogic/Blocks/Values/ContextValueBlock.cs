@@ -2,6 +2,7 @@ using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Entities.Utility;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 
 namespace AgoraGameLogic.Logic.Blocks.Values;
 
@@ -10,35 +11,43 @@ public class ContextValueBlock : ValueBlockBase
     private Value<string> _bindingName;
     private Value<string[]>? _fields;
     
-    public ContextValueBlock(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public ContextValueBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        _bindingName = Value<string>.Parse(definition.Inputs[0], gameData);
+        _bindingName = Value<string>.ParseOrThrow(buildData.Inputs[0], gameData);
 
-        if (definition.Inputs.Count > 1)
+        // optional fields to dig in
+        if (buildData.Inputs.Count > 1)
         {
-            _fields = Value<string[]>.Parse(definition.Inputs[1], gameData);
+            _fields = Value<string[]>.ParseOrThrow(buildData.Inputs[1], gameData);
         }
     }
     
-    public override T GetValue<T>(IContext context)
+    public override Result<T> GetValue<T>(IContext context)
     {
-        var key = _bindingName.GetValue(context);
-        var result = context.Get<object>(key);
-        if (_fields != null)
+        try
         {
-            if (result is GameModule gameModule)
+            var key = _bindingName.GetValueOrThrow(context);
+            var result = context.Get<object>(key);
+            if (_fields != null)
             {
-                foreach (var field in _fields.GetValue(context))
+                if (result is GameModule gameModule)
                 {
-                    result = gameModule.Fields.Get<object>(field);
+                    foreach (var field in _fields.GetValueOrThrow(context))
+                    {
+                        result = gameModule.Fields.Get<object>(field);
+                    }
+                }
+                else
+                {
+                    throw new Exception($"ContextValueBlock called with fields, but isn't a game module. key: {key}, result : {result}");
                 }
             }
-            else
-            {
-                throw new Exception($"ContextValueBlock called with fields, but isn't a game module. key: {key}, result : {result}");
-            }
-        }
 
-        return (T)result;
+            return Result<T>.Success((T)result);
+        }
+        catch (Exception e)
+        {
+            return Result<T>.Failure(e.Message);
+        }
     }
 }

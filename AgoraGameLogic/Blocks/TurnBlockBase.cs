@@ -3,6 +3,7 @@ using AgoraGameLogic.Domain.Entities.BuildDefinition;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Enums;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
 using AgoraGameLogic.Logic.Blocks.Turns.Option;
 
 namespace AgoraGameLogic.Logic.Blocks;
@@ -18,61 +19,101 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
     // for NumberOfActionOption
     private Dictionary<GameModule, int> _numberOfActionByPlayer = new Dictionary<GameModule, int>();
     
-    public TurnBlockBlockBase(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public TurnBlockBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
         _animationService = gameData.AnimationService;
     }
     
-    protected async Task ExecuteStart(IContext context, GameModule player)
+    protected async Task<Result> ExecuteStart(IContext context, GameModule player)
     {
         var startScope = new Scope(this, ScopeType.Start, player.Id);
-        await ExecuteSequenceAsync(StartBranch, context, startScope);
+        var executeSequenceResult = await ExecuteSequenceAsync(StartBranch, context, startScope);
+        if (!executeSequenceResult.IsSuccess)
+        {
+            return Result.Failure(executeSequenceResult.Error);
+        }
+        
+        return Result.Success();
     }
     
-    protected async Task ExecuteUpdate(IContext context, GameModule player)
+    protected async Task<Result> ExecuteUpdate(IContext context, GameModule player)
     {
-        var numberOfAllowedAction = HasOption<NumberOfActionOption>() ? GetOption<NumberOfActionOption>().GetNumberOfAction(context) : 1;
-        _numberOfActionByPlayer[player] = 0;
-        
-        while (_numberOfActionByPlayer[player] < numberOfAllowedAction)
+        try
         {
-            // remove previous update command for this player
-            FilterCommands(ScopeType.Update, player);
+            var numberOfAllowedAction = HasOption<NumberOfActionOption>() ? GetOptionOrThrow<NumberOfActionOption>().GetNumberOfActionOrThrow(context) : 1;
+            _numberOfActionByPlayer[player] = 0;
         
-            // execute update
-            var updateScope = new Scope(this, ScopeType.Update, player.Id);
-            await ExecuteSequenceAsync(UpdateBranch, context, updateScope);
+            while (_numberOfActionByPlayer[player] < numberOfAllowedAction)
+            {
+                // remove previous update command for this player
+                FilterCommands(ScopeType.Update, player);
+        
+                // execute update
+                var updateScope = new Scope(this, ScopeType.Update, player.Id);
+                var executeSequenceResult = await ExecuteSequenceAsync(UpdateBranch, context, updateScope);
+                if (!executeSequenceResult.IsSuccess)
+                {
+                    return Result.Failure(executeSequenceResult.Error);
+                }
                 
-            // wait for an action to be made
-            await CompletionSource.Task;
-            ResetCompletionSource();
+                // wait for an action to be made
+                await CompletionSource.Task;
+                ResetCompletionSource();
+            }
+            
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message);
         }
     }
     
-    protected async Task ExecuteEnd(IContext context, GameModule player)
+    protected async Task<Result> ExecuteEnd(IContext context, GameModule player)
     {
-        // remove all commands from start or update
-        FilterCommands(ScopeType.Start, player);
-        FilterCommands(ScopeType.Update, player);
-        
-        // execute end
-        var endScope = new Scope(this, ScopeType.End, player.Name);
-        await ExecuteSequenceAsync(EndBranch, context, endScope);
-        
-        FilterCommands(ScopeType.End, player);
+        try
+        {
+            // remove all commands from start or update
+            FilterCommands(ScopeType.Start, player);
+            FilterCommands(ScopeType.Update, player);
+
+            // execute end
+            var endScope = new Scope(this, ScopeType.End, player.Name);
+            var executeSequenceResult = await ExecuteSequenceAsync(EndBranch, context, endScope);
+            if (!executeSequenceResult.IsSuccess)
+            {
+                return Result.Failure(executeSequenceResult.Error);
+            }
+
+            FilterCommands(ScopeType.End, player);
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message);
+        }
     }
     
     // fwfe
     
-    public void RegisterActionCount(GameModule player)
+    public Result RegisterActionCount(GameModule player)
     {
-        if (!_numberOfActionByPlayer.ContainsKey(player))
+        try
         {
-            _numberOfActionByPlayer[player] = 0;
+            if (!_numberOfActionByPlayer.ContainsKey(player))
+            {
+                _numberOfActionByPlayer[player] = 0;
+            }
+
+            _numberOfActionByPlayer[player]++;
+            ValidateCompletionSource();
+
+            return Result.Success();
         }
-        
-        _numberOfActionByPlayer[player]++;
-        ValidateCompletionSource();
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message);
+        }
     }
 
     protected void FilterCommands(ScopeType scopeType, GameModule player)

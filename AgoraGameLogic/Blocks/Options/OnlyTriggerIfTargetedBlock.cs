@@ -5,7 +5,7 @@ namespace AgoraGameLogic.Logic.Blocks._options;
 
 public class OnlyTriggerIfTargetedBlock : OptionBlockBase
 {
-    public OnlyTriggerIfTargetedBlock(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public OnlyTriggerIfTargetedBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
         
     }

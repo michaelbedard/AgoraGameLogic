@@ -4,34 +4,44 @@ using AgoraGameLogic.Domain.Entities.DataObject;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Entities.Utility;
 using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Entities;
+using AgoraGameLogic.Logic.Blocks.Values;
 
 namespace AgoraGameLogic.Logic.Blocks;
 
 public abstract class InputBlockBase : StatementBlockBase
 {
-    public InputBlockBase(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    public InputBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
     }
 }
 
-public abstract class InputBlockBase<TCommand, TBlock> : InputBlockBase
-    where TCommand : InputCommandBase<TCommand, TBlock>
-    where TBlock : InputBlockBase<TCommand, TBlock>
+public abstract class InputBlockBase<TCommand, TBlock, TEvent> : InputBlockBase
+    where TCommand : InputCommand<TCommand, TBlock, TEvent>
+    where TBlock : InputBlockBase<TCommand, TBlock, TEvent>
+    where TEvent : EventBlockBase
 {
-    protected InputBlockBase(BlockDefinition definition, GameData gameData) : base(definition, gameData)
+    protected InputBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
     }
     
-    public abstract TCommand GetCommand(IContext context);
-    protected abstract void CompletePendingRequest(PendingRequest<InputCommandBase> pendingRequest, TCommand command);
+    public abstract TCommand GetCommandOrThrow(IContext context);
     
-    public override async Task ExecuteAsync(IContext context, Scope scope)
+    public override async Task<Result> ExecuteAsync(IContext context, Scope scope)
     {
-        var command = GetCommand(context);
-        var pendingRequest = PushInput(command);
-        CompletePendingRequest(pendingRequest, command);
-        
-        // wait for response
-        await CompletionSource.Task;
+        try
+        {
+            var command = GetCommandOrThrow(context);
+            PushInputOrThrow(command).For(command.Target);
+
+            // wait for response
+            await CompletionSource.Task;
+
+            return Result.Success();
+        }
+        catch (Exception e)
+        {
+            return Result.Failure(e.Message);
+        }
     }
 }

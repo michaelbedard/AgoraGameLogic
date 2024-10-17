@@ -4,6 +4,7 @@ using AgoraGameLogic.Domain.Entities.DataObject;
 using AgoraGameLogic.Domain.Entities.Models;
 using AgoraGameLogic.Domain.Enums;
 using AgoraGameLogic.Domain.Extensions;
+using AgoraGameLogic.Entities;
 using AgoraGameLogic.Logic.Blocks.Game;
 using Newtonsoft.Json.Linq;
 
@@ -38,28 +39,38 @@ public class GameLogic
         
         // parse
         var buildJObject = JObject.Parse(gameBuild);
-        var buildDefinition = BuildDefinition.Parse(buildJObject);
+        var gameBuildDataResult = GameBuildData.Parse(buildJObject);
+        if (!gameBuildDataResult.IsSuccess)
+        {
+            throw new Exception($"Error parsing game build: {gameBuildDataResult.Error}");
+        }
         
         // load gameModules
-        var gameModulesToDefinition = gameLoader.LoadGameModules(
-            buildDefinition.GameModules, 
-            buildDefinition.Structures, 
-            _gameData);
+        var gameBuildData = gameBuildDataResult.Value;
+        var gameModulesToBuildDataResult = gameLoader.LoadGameModules(gameBuildData.GameModules, gameBuildData.Structures, _gameData);
+        if (!gameModulesToBuildDataResult.IsSuccess)
+        {
+            throw new Exception(gameBuildDataResult.Error);
+        }
         
         // set players
-        _gameData.Players = gameModulesToDefinition.Keys.Where(gm => gm.Type == GameModuleType.Player);
+        var gameModulesToBuildData = gameModulesToBuildDataResult.Value;
+        _gameData.Players = gameModulesToBuildData.Keys.Where(gm => gm.Type == GameModuleType.Player);
         
-        // load global variables, events and scoring rules
-        gameLoader.LoadDescriptions(gameModulesToDefinition, buildDefinition.Structures, _gameData);
-        gameLoader.LoadGameModuleEvents(gameModulesToDefinition, buildDefinition.Structures, _gameData);
-        gameLoader.LoadGlobalVariables(buildDefinition.GlobalVariables, _gameData); 
-        gameLoader.LoadGlobalEvents(buildDefinition.GlobalBlocks, _gameData);
-        gameLoader.LoadScoringRules(buildDefinition.ScoringRules, _gameData);
+        // load descriptions, game module events, global variables, global events and scoring rules
+        var loadResult = gameLoader.LoadDescriptions(gameModulesToBuildData, gameBuildData.Structures, _gameData)
+            .Then(() => gameLoader.LoadGameModuleEvents(gameModulesToBuildData, gameBuildData.Structures, _gameData))
+            .Then(() => gameLoader.LoadGlobalVariables(gameBuildData.GlobalVariables, _gameData))
+            .Then(() => gameLoader.LoadGlobalEvents(gameBuildData.GlobalBlocks, _gameData))
+            .Then(() => gameLoader.LoadScoringRules(gameBuildData.ScoringRules, _gameData));
+
+        if (!loadResult.IsSuccess)
+        {
+            throw new Exception($"Error loading game: {loadResult.Error}");
+        }
 
         // log
         Console.WriteLine(_gameData.GlobalContext.ToString());
-        
-        _gameData.GlobalContext.Get<GameModule>("DrawingDeck").Fields.Get<List<GameModule>>("Cards").PrintToConsole();
 
         return "";
     }
@@ -68,7 +79,16 @@ public class GameLogic
     {
         _gameData.GameIsRunning = true;
         
-        _gameData.EventService.TriggerEvents<OnStartGameBlock>(_gameData.GlobalContext.Copy(), Array.Empty<object>(), null);
+        Task.Run(async () =>
+        {
+            // perform action
+            var result = await _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(_gameData.GlobalContext.Copy(), new StartGameCommand(), null);
+            if (!result.IsSuccess)
+            {
+                Console.WriteLine($"Start game failed: {result.Error}");
+            }
+        });
+        
         InvokeOnGameStateChange();
     }
     
@@ -76,7 +96,18 @@ public class GameLogic
     {
         if (!_gameData.GameIsRunning) return;
         
-        _gameData.ActionService.PerformAction(_gameData.GlobalContext.Copy(), playerId, actionCommandId);
+        Task.Run(async () =>
+        {
+            // perform action
+            var result = await _gameData.ActionService
+                .PerformActionAsync(_gameData.GlobalContext.Copy(), playerId, actionCommandId);
+
+            if (!result.IsSuccess)
+            {
+                Console.WriteLine($"Action failed: {result.Error}");
+            }
+        });
+        
         InvokeOnGameStateChange();
     }
     
@@ -84,18 +115,45 @@ public class GameLogic
     {
         if (!_gameData.GameIsRunning) return;
         
-        _gameData.InputService.PerformInput(_gameData.GlobalContext.Copy(), playerId, inputCommandId, actionArg);
+        // _gameData.InputServiceBase.PerformInput(_gameData.GlobalContext.Copy(), playerId, inputCommandId, actionArg);
         InvokeOnGameStateChange();
     }
 
     private void InvokeOnGameStateChange()
     {
+        // get results
+        var animationsResult = _gameData.AnimationService.GetDtos();
+        if (!animationsResult.IsSuccess)
+        {
+            throw new Exception(animationsResult.Error);
+        }
+        
+        var actionsResult = _gameData.ActionService.GetDtos();
+        if (!actionsResult.IsSuccess)
+        {
+            throw new Exception(actionsResult.Error);
+        }
+        
+        var inputsResult = _gameData.InputService.GetDtos();
+        if (!inputsResult.IsSuccess)
+        {
+            throw new Exception(inputsResult.Error);
+        }
+        
+        var descriptionsResult = _gameData.DescriptionService.GetDescriptionDtos(_gameData.GlobalContext);
+        if (!descriptionsResult.IsSuccess)
+        {
+            throw new Exception(descriptionsResult.Error);
+        }
+        
+        
+        // build state change Dto and invoke 
         _gameData.OnGameStateChange.Invoke(new StateChangeDto()
         {
-            Animations = _gameData.AnimationService.GetDtos(),
-            Actions = _gameData.ActionService.GetDtos(),
-            Inputs = _gameData.InputService.GetDtos(),
-            Descriptions = _gameData.DescriptionService.GetDescriptionDtos(_gameData.GlobalContext)
+            Animations = animationsResult.Value,
+            Actions = actionsResult.Value,
+            Inputs = inputsResult.Value,
+            Descriptions = descriptionsResult.Value
         });
     }
 }

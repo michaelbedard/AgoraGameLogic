@@ -5,10 +5,10 @@ namespace AgoraGameLogic.Control.GameLoader;
 
 public class GameLoaderUtility
 {
-    public static List<string> GetNamesForGameModule(string baseName, GameModuleDefinition gameModuleDefinition, int numberOfPlayers)
+    public static List<string> GetNamesForGameModuleOrThrow(string baseName, GameModuleBuildData gameModuleBuildData, int numberOfPlayers)
     {
         var names = new List<string>();
-        switch (gameModuleDefinition.Type)
+        switch (gameModuleBuildData.Type)
         {
             case GameModuleType.Player:
             {
@@ -20,7 +20,7 @@ public class GameLoaderUtility
             }
             case GameModuleType.Card:
             {
-                for (var i = 0; i < gameModuleDefinition.Iterations; i++)
+                for (var i = 0; i < gameModuleBuildData.Iterations; i++)
                 {
                     names.Add($"{baseName}{i}");
                 }
@@ -36,16 +36,16 @@ public class GameLoaderUtility
         return names;
     }
 
-    public static List<StructureDefinition> GetStructureHierarchy(StructureDefinition[] structureDefinitions, string structureName)
+    public static List<StructureBuildData> GetStructureHierarchyOrThrow(StructureBuildData[] structureDefinitions, string structureName)
     {
-        return GetStructureHierarchyHelper(structureDefinitions, structureName, new List<StructureDefinition>());
+        return GetStructureHierarchyHelper(structureDefinitions, structureName, new List<StructureBuildData>());
     }
 
-    private static List<StructureDefinition> GetStructureHierarchyHelper(StructureDefinition[] structureDefinitions, string structureName, List<StructureDefinition> acc)
+    private static List<StructureBuildData> GetStructureHierarchyHelper(StructureBuildData[] structureDefinitions, string structureName, List<StructureBuildData> acc)
     {
         if (string.IsNullOrEmpty(structureName))
         {
-            return new List<StructureDefinition>();
+            return new List<StructureBuildData>();
         }
         
         foreach (var structureDefinition in structureDefinitions)
