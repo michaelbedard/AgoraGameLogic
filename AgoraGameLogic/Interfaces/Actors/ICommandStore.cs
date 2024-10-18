@@ -1,7 +1,8 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Entities;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Actors;
 
 public interface ICommandStore<T> where T : Command
 {

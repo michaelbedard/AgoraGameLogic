@@ -1,12 +1,12 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Commands;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Logic.Blocks;
+namespace AgoraGameLogic.Blocks;
 
 public abstract class ActionBlockBase : StatementBlockBase
 {
@@ -21,7 +21,6 @@ public abstract class ActionBlockBase<TCommand, TBlock, TEvent> : ActionBlockBas
     where TEvent : EventBlockBase
 {
     protected Value<ActionBehavior> BehaviorValue;
-    
     protected ActionBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
         BehaviorValue = Value<ActionBehavior>.ParseOrThrow(buildData.Inputs[0], gameData); // always in 1st place
@@ -29,11 +28,10 @@ public abstract class ActionBlockBase<TCommand, TBlock, TEvent> : ActionBlockBas
 
     public abstract TCommand GetCommandOrThrow(IContext context);
     
-    public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
+    protected override async Task<Result> ExecuteAsync(IContext context)
     {
         try
         {
-            Scope = scope;
             var behavior= BehaviorValue.GetValueOrThrow(context);
             var command = GetCommandOrThrow(context);
         

@@ -1,10 +1,12 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.DataObject.ActionCommandDtos;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Dtos.ActionCommandDtos;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Logic.Blocks.Actions.Deck.Draw;
+namespace AgoraGameLogic.Blocks.Actions.DrawCard;
 
 public class DrawCardCommand : ActionCommand<DrawCardCommand, DrawCardBlock, OnDrawCardBlock>
 {
@@ -32,6 +34,10 @@ public class DrawCardCommand : ActionCommand<DrawCardCommand, DrawCardBlock, OnD
             // TODO
 
             return Result.Success();
+        }
+        catch (IndexOutOfRangeException e)
+        {
+            return Result.Failure("No more cards in deck");
         }
         catch (Exception e)
         {

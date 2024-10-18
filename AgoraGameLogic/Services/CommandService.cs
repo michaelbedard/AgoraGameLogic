@@ -1,11 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks;
 using AgoraGameLogic.Core.Entities.Utility;
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.Commands;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Services;
 
 public abstract class CommandService<TCommand> where TCommand : Command
 {
@@ -167,14 +171,25 @@ public abstract class CommandService<TCommand> where TCommand : Command
     {
         try
         {
-            var result = CommandStoresByPlayerName.ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value.GetAllCommands().Value
-                    .Select(a => a.GetDto())
-                    .ToArray()
-            );
+            var resultDictionary = new Dictionary<string, CommandDto[]>();
+            foreach (var commandStoreByPlayer in CommandStoresByPlayerName)
+            {
+                var allCommandsResult = commandStoreByPlayer.Value.GetAllCommands();
+                if (!allCommandsResult.IsSuccess)
+                {
+                    return Result<Dictionary<string, CommandDto[]>>.Failure(allCommandsResult.Error);
+                }
+                
+                var commandDtoList = new List<CommandDto>();
+                foreach (var command in allCommandsResult.Value)
+                {
+                    commandDtoList.Add(command.GetDto());
+                }
 
-            return Result<Dictionary<string, CommandDto[]>>.Success(result);
+                resultDictionary[commandStoreByPlayer.Key] = commandDtoList.ToArray();
+            }
+
+            return Result<Dictionary<string, CommandDto[]>>.Success(resultDictionary);
         }
         catch (Exception e)
         {
@@ -186,7 +201,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
         }
     }
 
-    public Result InitializeDictionnaryEntries(List<GameModule> players)
+    public Result InitializeDictionaryEntries(List<GameModule> players)
     {
         try
         {

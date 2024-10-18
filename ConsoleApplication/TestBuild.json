@@ -27,7 +27,7 @@
 //        ]},
         {"Type": "OnDrawCardBlock", "Options": [], "Inputs": [
           [
-            {"Type": "LogBlock", "Inputs": ["Again!"]}
+            {"Type": "LogBlock", "Inputs": ["Trigger from OnDrawCardBlock by card!!!"]}
           ]
         ]}
       ]
@@ -105,17 +105,27 @@
         {"Type": "IfBlock", "Inputs": [
           {"Type": "EqualsBlock", "Inputs": ["hello", "hello"]},
           [
-            {"Type": "LogBlock", "Inputs": ["this is the true branch!"]},
-            {"Type": "DrawCardBlock", "Inputs": ["Allow",
-              {"Type": "ContextValueBlock", "Inputs" : ["Player0"]}, 
-              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
-            ]}
+            {"Type": "LogBlock", "Inputs": ["this is the true branch!"]}
           ]
         ]},
-        {"Type" : "TurnByTurnBlock", "Inputs" : [
+        {"Type" : "TurnByTurnBlock", "Options" : [
+          {"Type": "NumberOfActionTurnOption", "Inputs" : [2]}
+        ], "Inputs" : [
           [
             // start branch
-            {"Type": "LogBlock", "Inputs": ["START"]}
+            {"Type": "LogBlock", "Inputs": ["START"]},
+            {"Type": "DrawCardBlock", "Inputs": ["Allow",
+              {"Type": "ContextValueBlock", "Inputs" : ["player"]}, // current player
+              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
+            ]},
+            {"Type": "DrawCardBlock", "Inputs": ["Allow",
+              {"Type": "ContextValueBlock", "Inputs" : ["player"]}, // current player
+              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
+            ]},
+            {"Type": "DrawCardBlock", "Inputs": ["Allow",
+              {"Type": "ContextValueBlock", "Inputs" : ["player"]}, // current player
+              {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
+            ]}
           ], 
           [
             // update branch

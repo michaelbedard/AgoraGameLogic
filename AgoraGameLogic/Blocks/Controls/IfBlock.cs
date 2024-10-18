@@ -1,11 +1,12 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Extensions;
 
-namespace AgoraGameLogic.Logic.Blocks.Controls;
+namespace AgoraGameLogic.Blocks.Controls;
 
 public class IfBlock : StatementBlockBase
 {
@@ -18,13 +19,13 @@ public class IfBlock : StatementBlockBase
         _trueBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[1].AsValidArray(), gameData);
     }
 
-    public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
+    protected override async Task<Result> ExecuteAsync(IContext context)
     {
         try
         {
             if (_condition.IsSatisfiedOrThrow(context))
             {
-                return await ExecuteSequenceAsync(_trueBranch, context, scope); // this return a result
+                return await ExecuteSequenceAsync(_trueBranch, context); // this return a result
             }
 
             return Result.Success();

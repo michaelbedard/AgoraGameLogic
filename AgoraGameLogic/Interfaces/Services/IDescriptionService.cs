@@ -1,9 +1,10 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Entities;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Interfaces.Actors;
 using Newtonsoft.Json.Linq;
 
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Services;
 
 public interface IDescriptionService
 {

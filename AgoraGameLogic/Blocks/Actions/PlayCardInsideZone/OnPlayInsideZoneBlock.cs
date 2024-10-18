@@ -1,11 +1,11 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Extensions;
 
-namespace AgoraGameLogic.Logic.Blocks.Commands.Actions.Card.PlayInsideZone;
+namespace AgoraGameLogic.Blocks.Actions.PlayCardInsideZone;
 
 public class OnPlayInsideZoneBlock : EventBlockBase<PlayInsideZoneCommand>
 {

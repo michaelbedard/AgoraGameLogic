@@ -1,9 +1,10 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Rules;
+using System;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Services;
 
-namespace AgoraGameLogic.Control.Services;
+namespace AgoraGameLogic.Services;
 
 public class ScoringService : IScoringService
 {

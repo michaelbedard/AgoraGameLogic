@@ -1,9 +1,9 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Interfaces;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks.Inputs;
+namespace AgoraGameLogic.Blocks.Inputs.ChoiceInput;
 
 public class ChoiceBlock : InputBlockBase<ChoiceCommand, ChoiceBlock, OnChoiceBlock>
 {

@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Domain.Entities.DataObject.ActionCommandDtos;
+namespace AgoraGameLogic.Dtos.ActionCommandDtos;
 
 public class PlayCardInsideZoneActionDto : CommandDto
 {

@@ -1,6 +1,8 @@
-using AgoraGameLogic.Entities;
+using System;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
 
-namespace AgoraGameLogic.Domain.Extensions;
+namespace AgoraGameLogic.Utility.Extensions;
 
 public static class ResultExtensions
 {

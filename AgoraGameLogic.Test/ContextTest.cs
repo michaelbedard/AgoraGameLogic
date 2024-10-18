@@ -1,6 +1,8 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Interfaces;
+using System;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.Enums;
+using NUnit.Framework;
 
 namespace AgoraGameLogic.Test;
 

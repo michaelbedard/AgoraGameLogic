@@ -1,6 +1,7 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks.Inputs;
+namespace AgoraGameLogic.Blocks.Options.InputOptions;
 
 public class AddToHandOption : OptionBlockBase
 {

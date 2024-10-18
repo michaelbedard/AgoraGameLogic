@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Actors;
 
 public interface IContext
 {

@@ -1,10 +1,10 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks.Inputs;
+namespace AgoraGameLogic.Blocks.Inputs.ChoiceInput;
 
 public class OnChoiceBlock : EventBlockBase<ChoiceCommand>
 {

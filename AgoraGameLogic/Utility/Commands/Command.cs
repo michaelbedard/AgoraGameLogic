@@ -1,6 +1,9 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
+using System;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Dtos;
 
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Utility.Commands;
 
 public abstract class Command : IEquatable<Command>
 {

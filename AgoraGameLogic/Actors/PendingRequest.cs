@@ -1,8 +1,8 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System.Collections.Generic;
+using AgoraGameLogic.Interfaces.Services;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Core.Entities.Utility;
+namespace AgoraGameLogic.Actors;
 
 public class PendingRequest<T> where T : Command
 {

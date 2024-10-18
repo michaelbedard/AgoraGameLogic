@@ -1,9 +1,9 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Rules.ScoringRules;
+using System;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.GameRules.ScoringRules;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Rules;
+namespace AgoraGameLogic.Factories;
 
 public class ScoringRuleFactory
 {

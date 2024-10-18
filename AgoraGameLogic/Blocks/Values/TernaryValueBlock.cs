@@ -1,10 +1,10 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks.Values;
+namespace AgoraGameLogic.Blocks.Values;
 
 public class TernaryValueBlock : ValueBlockBase
 {

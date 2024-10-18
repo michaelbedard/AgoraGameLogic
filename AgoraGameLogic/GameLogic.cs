@@ -1,11 +1,11 @@
-﻿using AgoraGameLogic.Control.GameLoader;
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Game;
+﻿using System;
+using System.Linq;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks.Game.StartGame;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Enums;
+using AgoraGameLogic.Utility.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -36,7 +36,7 @@ public class GameLogic
     public string LoadGame(string gameBuild, int numberOfPlayers)
     {
         _gameData.NumberOfPlayers = numberOfPlayers;
-        var gameLoader = new GameLoader();
+        var gameLoader = new GameLoader.GameLoader();
         
         // parse
         var buildJObject = JObject.Parse(gameBuild);
@@ -70,9 +70,9 @@ public class GameLogic
         }
         
         // initialize services
-        var initializeResult = _gameData.InputService.InitializeDictionnaryEntries(_gameData.Players)
-            .Then(() => _gameData.ActionService.InitializeDictionnaryEntries(_gameData.Players))
-            .Then(() => _gameData.AnimationService.InitializeDictionnaryEntries(_gameData.Players));
+        var initializeResult = _gameData.InputService.InitializeDictionaryEntries(_gameData.Players)
+            .Then(() => _gameData.ActionService.InitializeDictionaryEntries(_gameData.Players))
+            .Then(() => _gameData.AnimationService.InitializeDictionaryEntries(_gameData.Players));
         if (!initializeResult.IsSuccess)
         {
             throw new Exception($"[Error initializing dictionnaries] {initializeResult.Error}");

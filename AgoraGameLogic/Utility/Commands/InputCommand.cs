@@ -1,10 +1,10 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Interfaces.Actors;
 
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Utility.Commands;
 
 public abstract class InputCommand : Command
 {
@@ -68,7 +68,7 @@ public abstract class InputCommand<TCommand, TBlock, TEvent> : InputCommand
     
     public override CommandDto GetDto()
     {
-        var temp = GetDto();
+        var temp = InitializeDto();
         temp.Key = nameof(TCommand);
         temp.Options = Options;
 

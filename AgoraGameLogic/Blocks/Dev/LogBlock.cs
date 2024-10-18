@@ -1,11 +1,10 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks._dev;
+namespace AgoraGameLogic.Blocks.Dev;
 
 public class LogBlock : StatementBlockBase
 {
@@ -16,7 +15,7 @@ public class LogBlock : StatementBlockBase
         Data = Value<object>.ParseOrThrow(buildData.Inputs[0], gameData);
     }
 
-    public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
+    protected override async Task<Result> ExecuteAsync(IContext context)
     {
         try
         {

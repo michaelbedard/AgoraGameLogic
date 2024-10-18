@@ -1,10 +1,10 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks.Controls;
+namespace AgoraGameLogic.Blocks.Controls;
 
 public class SetValueBlock : StatementBlockBase
 {
@@ -17,7 +17,7 @@ public class SetValueBlock : StatementBlockBase
         _value = Value<object>.ParseOrThrow(buildData.Inputs[1], gameData);
     }
     
-    public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
+    protected override async Task<Result> ExecuteAsync(IContext context)
     {
         try
         {

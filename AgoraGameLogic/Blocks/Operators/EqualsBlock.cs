@@ -1,11 +1,9 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using Newtonsoft.Json.Serialization;
+using System;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks.Operators;
+namespace AgoraGameLogic.Blocks.Operators;
 
 public class EqualsBlock : ConditionBlockBase
 {

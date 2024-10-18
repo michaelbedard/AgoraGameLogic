@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Logic.Rules.ScoringRules;
+namespace AgoraGameLogic.GameRules.ScoringRules;
 
 public class ScaleWithCountScoringRule
 {

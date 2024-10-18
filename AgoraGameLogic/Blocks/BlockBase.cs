@@ -1,11 +1,15 @@
-using AgoraGameLogic.Control.Services;
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Services;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Logic.Blocks;
+namespace AgoraGameLogic.Blocks;
 
 public abstract class BlockBase
 {
@@ -15,7 +19,7 @@ public abstract class BlockBase
     protected BlockType BlockType;
     protected OptionBlockBase[] Options;
     
-    protected IEnumerable<GameModule> Players;
+    protected List<GameModule> Players;
     
 
     public BlockBase(BlockBuildData buildData, GameData gameData)

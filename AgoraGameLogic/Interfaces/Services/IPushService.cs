@@ -1,6 +1,6 @@
-using AgoraGameLogic.Domain.Entities.Models;
+using AgoraGameLogic.Actors;
 
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Services;
 
 public interface IPushService<T>
 {

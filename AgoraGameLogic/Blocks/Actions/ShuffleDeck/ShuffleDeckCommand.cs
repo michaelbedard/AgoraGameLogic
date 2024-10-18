@@ -1,10 +1,12 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.Commands;
+using AgoraGameLogic.Utility.Extensions;
 
-namespace AgoraGameLogic.Logic.Blocks.Actions.Deck.Shuffle;
+namespace AgoraGameLogic.Blocks.Actions.ShuffleDeck;
 
 public class ShuffleDeckCommand : ActionCommand<ShuffleDeckCommand, ShuffleDeckBlock, OnShuffleDeckBlock>
 {

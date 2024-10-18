@@ -1,21 +1,25 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks._dev;
-using AgoraGameLogic.Logic.Blocks._options;
-using AgoraGameLogic.Logic.Blocks.Actions.Card.PlayFromHand;
-using AgoraGameLogic.Logic.Blocks.Actions.Deck.Draw;
-using AgoraGameLogic.Logic.Blocks.Actions.Deck.Shuffle;
-using AgoraGameLogic.Logic.Blocks.Commands.Actions.Card.PlayInsideZone;
-using AgoraGameLogic.Logic.Blocks.Controls;
-using AgoraGameLogic.Logic.Blocks.Game;
-using AgoraGameLogic.Logic.Blocks.Inputs;
-using AgoraGameLogic.Logic.Blocks.Operators;
-using AgoraGameLogic.Logic.Blocks.Turns;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Blocks.Actions.DrawCard;
+using AgoraGameLogic.Blocks.Actions.PlayCard;
+using AgoraGameLogic.Blocks.Actions.PlayCardInsideZone;
+using AgoraGameLogic.Blocks.Actions.ShuffleDeck;
+using AgoraGameLogic.Blocks.Controls;
+using AgoraGameLogic.Blocks.Dev;
+using AgoraGameLogic.Blocks.Game;
+using AgoraGameLogic.Blocks.Game.StartGame;
+using AgoraGameLogic.Blocks.Inputs.ChoiceInput;
+using AgoraGameLogic.Blocks.Operators;
+using AgoraGameLogic.Blocks.Options;
+using AgoraGameLogic.Blocks.Options.TurnOptions;
+using AgoraGameLogic.Blocks.Turns;
+using AgoraGameLogic.Blocks.Values;
+using AgoraGameLogic.Utility.BuildData;
 using Newtonsoft.Json.Linq;
 
-namespace AgoraGameLogic.Logic.Blocks;
+namespace AgoraGameLogic.Factories;
 
 public class BlockFactory
 {
@@ -204,6 +208,7 @@ public class BlockFactory
 
                 // Options
                 nameof(OnlyTriggerIfTargetedBlock) => new OnlyTriggerIfTargetedBlock(blockBuildData, gameData),
+                nameof(NumberOfActionTurnOption) => new NumberOfActionTurnOption(blockBuildData, gameData),
 
                 // Action : card
                 nameof(PlayCardBlock) => new PlayCardBlock(blockBuildData, gameData),

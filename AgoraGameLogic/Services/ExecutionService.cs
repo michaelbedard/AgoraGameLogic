@@ -1,7 +1,8 @@
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Logic.Blocks;
+using System.Collections.Generic;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Interfaces.Services;
 
-namespace AgoraGameLogic.Control.Services;
+namespace AgoraGameLogic.Services;
 
 public class ExecutionService : IExecutionService
 {

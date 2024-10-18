@@ -1,11 +1,11 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Entities;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Control.GameLoader;
+namespace AgoraGameLogic.GameLoader;
 
 public partial class GameLoader
 {
@@ -142,10 +142,12 @@ public partial class GameLoader
             if (!result.IsSuccess)
                 throw new InvalidOperationException(result.Error);
 
-            var module = result.Value[0];
-            modules.Add(module);
-            gameModulesToDefinition[module] = moduleData;
-            parent.Fields.AddOrUpdate(moduleData.Name, ref module);
+            foreach (var childGameModule in result.Value)
+            {
+                modules.Add(childGameModule);
+                gameModulesToDefinition[childGameModule] = moduleData;
+                parent.Fields.AddOrUpdate(moduleData.Name, childGameModule);
+            }
         }
 
         return modules;

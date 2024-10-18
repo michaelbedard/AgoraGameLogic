@@ -1,11 +1,14 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Extensions;
 
-namespace AgoraGameLogic.Logic.Blocks.Controls;
+namespace AgoraGameLogic.Blocks.Controls;
 
 public class ForeachBlock : StatementBlockBase
 {
@@ -20,7 +23,7 @@ public class ForeachBlock : StatementBlockBase
         _loopBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[2].AsValidArray(), gameData);
     }
 
-    public override async Task<Result> ExecuteAsync(IContext context, Scope? scope)
+    protected override async Task<Result> ExecuteAsync(IContext context)
     {
         try
         {
@@ -34,7 +37,7 @@ public class ForeachBlock : StatementBlockBase
 
                 contextCopy.AddOrUpdate(key, ref item);
 
-                await ExecuteSequenceOrThrowAsync(_loopBranch, context, scope);
+                await ExecuteSequenceOrThrowAsync(_loopBranch, context, Scope);
             }
             
             return Result.Success();

@@ -1,8 +1,7 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Rules;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
 
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Services;
 
 public interface IScoringService
 {

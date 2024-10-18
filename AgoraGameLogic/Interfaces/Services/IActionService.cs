@@ -1,7 +1,9 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Entities;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Services;
 
 public interface IActionService : ICommandService<ActionCommand>
 {

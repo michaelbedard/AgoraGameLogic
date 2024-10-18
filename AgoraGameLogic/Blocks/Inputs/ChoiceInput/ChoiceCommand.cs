@@ -1,9 +1,14 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks.Options.InputOptions;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Dtos.InputCommandDtos;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Logic.Blocks.Inputs;
+namespace AgoraGameLogic.Blocks.Inputs.ChoiceInput;
 
 public class ChoiceCommand : InputCommand<ChoiceCommand, ChoiceBlock, OnChoiceBlock>
 {

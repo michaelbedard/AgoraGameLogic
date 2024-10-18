@@ -1,6 +1,6 @@
 using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Logic.Blocks.Game;
+namespace AgoraGameLogic.Blocks.Game.StartGame;
 
 public class StartGameCommand : EmptyCommand
 {

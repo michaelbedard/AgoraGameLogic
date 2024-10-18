@@ -1,7 +1,7 @@
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Logic.Blocks;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Actors;
 
 public class Scope
 {

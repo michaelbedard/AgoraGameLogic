@@ -1,16 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using AgoraGameLogic.Control.GameLoader;
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic;
-using AgoraGameLogic.Logic.Blocks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AgoraGameLogic.Control.Services;
+namespace AgoraGameLogic.Services;
 
 public class DescriptionService : IDescriptionService
 {

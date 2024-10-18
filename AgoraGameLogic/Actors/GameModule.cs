@@ -1,7 +1,7 @@
-using AgoraGameLogic.Domain.Enums;
-using Newtonsoft.Json;
+using System.Collections.Generic;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Actors;
 
 public class GameModule
 {

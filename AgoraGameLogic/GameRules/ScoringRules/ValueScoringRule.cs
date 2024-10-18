@@ -1,10 +1,8 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Rules.ScoringRules;
+namespace AgoraGameLogic.GameRules.ScoringRules;
 
 public class ValueScoringRule : ScoringRule
 {

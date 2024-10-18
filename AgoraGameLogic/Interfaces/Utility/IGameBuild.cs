@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Utility;
 
 public interface IGameBuild
 {

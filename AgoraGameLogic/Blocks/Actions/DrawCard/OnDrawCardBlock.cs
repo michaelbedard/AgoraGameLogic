@@ -1,11 +1,11 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Extensions;
 
-namespace AgoraGameLogic.Logic.Blocks.Actions.Deck.Draw;
+namespace AgoraGameLogic.Blocks.Actions.DrawCard;
 
 public class OnDrawCardBlock : EventBlockBase<DrawCardCommand>
 {

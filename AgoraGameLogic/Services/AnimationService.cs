@@ -1,8 +1,7 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Interfaces.Services;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Control.Services;
+namespace AgoraGameLogic.Services;
 
 public class AnimationService : CommandService<AnimationCommand>, IAnimationService
 {

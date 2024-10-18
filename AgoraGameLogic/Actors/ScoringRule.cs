@@ -1,8 +1,6 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using AgoraGameLogic.Interfaces.Actors;
 
-namespace AgoraGameLogic.Logic.Rules;
+namespace AgoraGameLogic.Actors;
 
 public abstract class ScoringRule
 {

@@ -1,11 +1,10 @@
-using AgoraGameLogic.Core.Entities.Utility;
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Interfaces;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Logic.Blocks.Actions.Card.PlayFromHand;
+namespace AgoraGameLogic.Blocks.Actions.PlayCard;
 
 public class PlayCardBlock : ActionBlockBase<PlayCardCommand, PlayCardBlock, OnPlayCardBlock>
 {

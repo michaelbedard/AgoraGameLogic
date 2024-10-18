@@ -1,8 +1,7 @@
 using System.Text;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
+using AgoraGameLogic.Interfaces.Actors;
 
-namespace AgoraGameLogic.Entities
+namespace AgoraGameLogic.Actors
 {
     public class Result
     {

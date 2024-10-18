@@ -1,7 +1,8 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Enums;
+using System.Collections.Generic;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Control.GameLoader;
+namespace AgoraGameLogic.GameLoader;
 
 public class GameLoaderUtility
 {

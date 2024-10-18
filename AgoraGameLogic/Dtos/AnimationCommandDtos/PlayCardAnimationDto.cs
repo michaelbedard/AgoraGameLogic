@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Domain.Entities.DataObject.AnimationCommandDtos;
+namespace AgoraGameLogic.Dtos.AnimationCommandDtos;
 
 public class PlayCardAnimationDto : CommandDto
 {

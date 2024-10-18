@@ -1,6 +1,7 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.Commands;
+
 // ReSharper disable All
 
 namespace AgoraGameLogic.Core.Entities.Utility;

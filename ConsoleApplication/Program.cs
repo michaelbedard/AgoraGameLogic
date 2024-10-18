@@ -1,4 +1,6 @@
-﻿using AgoraGameLogic;
+﻿using System;
+using System.IO;
+using AgoraGameLogic;
 using Newtonsoft.Json;
 
 var jsonFilePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "TestBuild.json");

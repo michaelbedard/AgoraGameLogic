@@ -1,6 +1,4 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-
-namespace AgoraGameLogic.Logic.Blocks.Inputs;
+namespace AgoraGameLogic.Dtos.InputCommandDtos;
 
 public class ChoiceInputDto : CommandDto
 {

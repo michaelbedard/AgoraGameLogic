@@ -1,6 +1,6 @@
-using AgoraGameLogic.Domain.Enums;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Domain.Entities.DataObject;
+namespace AgoraGameLogic.Dtos;
 
 public class EndGameDto
 {

@@ -1,12 +1,14 @@
-using AgoraGameLogic.Core.Entities.Utility;
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Other;
+using AgoraGameLogic.Interfaces.Services;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Commands;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Logic.Blocks;
+namespace AgoraGameLogic.Blocks;
 
 /// <summary>
 /// 
@@ -37,9 +39,20 @@ public abstract class StatementBlockBase : BlockBase
     
     // ABSTRACT
 
-    public abstract Task<Result> ExecuteAsync(IContext context, Scope? scope);
+    protected abstract Task<Result> ExecuteAsync(IContext context);
     
     // METHODS
+    
+    #region EXECUTION
+    
+    public Task<Result> ExecuteAsync(IContext context, Scope? scope)
+    {
+        Scope = scope;
+        return ExecuteAsync(context);
+    }
+    
+    
+    #endregion
     
     #region EVENTS
 
@@ -110,6 +123,20 @@ public abstract class StatementBlockBase : BlockBase
     public void ResetCompletionSource()
     {
         CompletionSource = new TaskCompletionSource<bool>();
+    }
+
+    #endregion
+
+    #region Sequence
+
+    protected async Task<Result> ExecuteSequenceAsync(StatementBlockBase[] blocks, IContext context)
+    {
+        return await ExecuteSequenceAsync(blocks, context, Scope);
+    }
+    
+    protected async Task ExecuteSequenceOrThrowAsync(StatementBlockBase[] blocks, IContext context)
+    {
+        await ExecuteSequenceOrThrowAsync(blocks, context, Scope);
     }
 
     #endregion

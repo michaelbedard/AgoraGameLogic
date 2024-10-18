@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Actors;
 
 public class Ref<T>
 {

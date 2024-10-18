@@ -1,7 +1,7 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks._options;
+namespace AgoraGameLogic.Blocks.Options;
 
 public class OnlyTriggerIfTargetedBlock : OptionBlockBase
 {

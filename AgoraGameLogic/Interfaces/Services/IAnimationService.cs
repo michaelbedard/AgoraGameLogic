@@ -1,6 +1,6 @@
-using AgoraGameLogic.Domain.Entities.Models;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Services;
 
 public interface IAnimationService : ICommandService<AnimationCommand>
 {

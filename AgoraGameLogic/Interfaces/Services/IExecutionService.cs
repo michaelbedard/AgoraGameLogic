@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Services;
 
 public interface IExecutionService
 {

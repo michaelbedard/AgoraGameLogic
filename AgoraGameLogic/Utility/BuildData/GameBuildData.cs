@@ -1,9 +1,10 @@
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Entities;
+using System;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Utility.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace AgoraGameLogic.Domain.Entities.BuildDefinition;
+namespace AgoraGameLogic.Utility.BuildData;
 
 public class GameBuildData
 {

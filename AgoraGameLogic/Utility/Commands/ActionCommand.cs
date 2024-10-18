@@ -1,11 +1,11 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks;
-using AgoraGameLogic.Logic.Blocks.Turns;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Blocks.Turns;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Interfaces.Actors;
 
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Utility.Commands;
 
 public abstract class ActionCommand : Command
 {
@@ -52,9 +52,9 @@ public abstract class ActionCommand<TCommand, TBlock, TEvent> : ActionCommand
         }
 
         // check if shouldRegisterAction
-        if (shouldRegisterAction && Scope != null && Scope.TurnBlock is TurnByTurnBlock turnByTurnBlock)
+        if (shouldRegisterAction && Scope != null)
         {
-            turnByTurnBlock.RegisterActionCount(Target);
+            Scope.TurnBlock.RegisterActionCount(Target);
         }
     
         return Result.Success();
@@ -105,6 +105,7 @@ public abstract class ActionCommand<TCommand, TBlock, TEvent> : ActionCommand
     public override CommandDto GetDto()
     {
         var temp = InitializeDto();
+        temp.Id = Id;
         temp.Key = typeof(TCommand).Name;
         temp.Options = Options;
         temp.TargetId = Target.Id;

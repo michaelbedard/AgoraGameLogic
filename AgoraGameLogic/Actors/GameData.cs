@@ -1,9 +1,10 @@
-using AgoraGameLogic.Control.Services;
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
+using System;
+using System.Collections.Generic;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Interfaces.Services;
+using AgoraGameLogic.Services;
 
-namespace AgoraGameLogic;
+namespace AgoraGameLogic.Actors;
 
 public class GameData
 {

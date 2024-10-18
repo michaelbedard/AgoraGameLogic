@@ -1,16 +1,15 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
 
-namespace AgoraGameLogic.Logic.Blocks.Turns.Option;
+namespace AgoraGameLogic.Blocks.Options.TurnOptions;
 
-public class NumberOfActionOption : OptionBlockBase
+public class NumberOfActionTurnOption : OptionBlockBase
 {
     private Value<int> _numberOfActionValue;
     
-    public NumberOfActionOption(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
+    public NumberOfActionTurnOption(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
         _numberOfActionValue = Value<int>.ParseOrThrow(buildData.Inputs[0], gameData);
     }

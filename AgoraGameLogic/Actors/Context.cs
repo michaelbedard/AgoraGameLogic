@@ -1,8 +1,10 @@
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AgoraGameLogic.Interfaces.Actors;
 using Newtonsoft.Json;
 
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Actors;
 
 public class Context : IContext
 {

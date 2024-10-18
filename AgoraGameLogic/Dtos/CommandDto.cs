@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace AgoraGameLogic.Domain.Entities.DataObject;
+namespace AgoraGameLogic.Dtos;
 
 public class CommandDto
 {

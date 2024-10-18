@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Text;
+using AgoraGameLogic.Utility;
 using Newtonsoft.Json;
 
-namespace AgoraGameLogic.Domain.Entities.DataObject;
+namespace AgoraGameLogic.Dtos;
 
 public class StateChangeDto
 {

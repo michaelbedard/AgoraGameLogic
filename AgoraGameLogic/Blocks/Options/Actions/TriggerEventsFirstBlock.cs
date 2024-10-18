@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Logic.Blocks.Actions._options;
+namespace AgoraGameLogic.Blocks.Options.Actions;
 
 public class TriggerEventsFirstBlock
 {

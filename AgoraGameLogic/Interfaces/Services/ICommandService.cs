@@ -1,10 +1,11 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Utility.Commands;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Domain.Interfaces;
+namespace AgoraGameLogic.Interfaces.Services;
 
 public interface ICommandService<T> where T : Command
 {
@@ -14,5 +15,5 @@ public interface ICommandService<T> where T : Command
     Result<T> GetCommand(string playerName, int commandId);
     Result FilterActions(TurnBlockBlockBase turnBlock, ScopeType scopeType, GameModule player);
     Result<Dictionary<string, CommandDto[]>> GetDtos();
-    Result InitializeDictionnaryEntries(List<GameModule> players);
+    Result InitializeDictionaryEntries(List<GameModule> players);
 }

@@ -1,7 +1,7 @@
-namespace AgoraGameLogic.Domain.Extensions;
-
 using System;
 using System.Collections.Generic;
+
+namespace AgoraGameLogic.Utility.Extensions;
 
 public static class ListExtensions
 {

@@ -1,7 +1,6 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Logic.Blocks;
+using AgoraGameLogic.Dtos;
 
-namespace AgoraGameLogic.Domain.Entities.Models;
+namespace AgoraGameLogic.Utility.Commands;
 
 public abstract class AnimationCommand : Command
 {

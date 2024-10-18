@@ -1,13 +1,11 @@
-using AgoraGameLogic.Core.Entities.Utility;
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Logic.Blocks;
+namespace AgoraGameLogic.Blocks;
 
 public abstract class InputBlockBase : StatementBlockBase
 {
@@ -21,19 +19,16 @@ public abstract class InputBlockBase<TCommand, TBlock, TEvent> : InputBlockBase
     where TBlock : InputBlockBase<TCommand, TBlock, TEvent>
     where TEvent : EventBlockBase
 {
-    // TYODO dfine Scope here
-    
     protected InputBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
     }
     
     public abstract TCommand GetCommandOrThrow(IContext context);
     
-    public override async Task<Result> ExecuteAsync(IContext context, Scope scope)
+    protected override async Task<Result> ExecuteAsync(IContext context)
     {
         try
         {
-            Scope = Scope = scope;
             var command = GetCommandOrThrow(context);
             PushInputOrThrow(command).For(command.Target);
 

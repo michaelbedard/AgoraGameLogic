@@ -1,7 +1,8 @@
-using AgoraGameLogic.Entities;
+using System;
+using AgoraGameLogic.Actors;
 using Newtonsoft.Json.Linq;
 
-namespace AgoraGameLogic.Domain.Extensions;
+namespace AgoraGameLogic.Utility.Extensions;
 
 public static class JTokenExtensions
 {

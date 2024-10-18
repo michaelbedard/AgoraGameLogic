@@ -1,4 +1,4 @@
-namespace AgoraGameLogic.Domain.Enums;
+namespace AgoraGameLogic.Utility.Enums;
 
 public enum EndGameMethod
 {

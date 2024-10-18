@@ -1,12 +1,15 @@
-using AgoraGameLogic.Control.Services;
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Enums;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Turns.Option;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks.Options.TurnOptions;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Services;
+using AgoraGameLogic.Services;
+using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Enums;
 
-namespace AgoraGameLogic.Logic.Blocks;
+namespace AgoraGameLogic.Blocks;
 
 public abstract class TurnBlockBlockBase : StatementBlockBase
 {
@@ -14,14 +17,16 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
     protected StatementBlockBase[] UpdateBranch;
     protected StatementBlockBase[] EndBranch;
     
-    private AnimationService _animationService;
+    private IActionService _actionService;
+    private IInputService _inputService;
     
     // for NumberOfActionOption
     private Dictionary<GameModule, int> _numberOfActionByPlayer = new Dictionary<GameModule, int>();
     
     public TurnBlockBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        _animationService = gameData.AnimationService;
+        _actionService = gameData.ActionService;
+        _inputService = gameData.InputService;
     }
     
     protected async Task<Result> ExecuteStart(IContext context, GameModule player)
@@ -40,7 +45,7 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
     {
         try
         {
-            var numberOfAllowedAction = HasOption<NumberOfActionOption>() ? GetOptionOrThrow<NumberOfActionOption>().GetNumberOfActionOrThrow(context) : 1;
+            var numberOfAllowedAction = HasOption<NumberOfActionTurnOption>() ? GetOptionOrThrow<NumberOfActionTurnOption>().GetNumberOfActionOrThrow(context) : 1;
             _numberOfActionByPlayer[player] = 0;
         
             while (_numberOfActionByPlayer[player] < numberOfAllowedAction)
@@ -116,8 +121,9 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
         }
     }
 
-    protected void FilterCommands(ScopeType scopeType, GameModule player)
+    public void FilterCommands(ScopeType scopeType, GameModule player)
     {
-        _animationService.FilterActions(this, scopeType, player);
+        _actionService.FilterActions(this, scopeType, player);
+        _inputService.FilterActions(this, scopeType, player);
     }
 }

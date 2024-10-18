@@ -1,10 +1,12 @@
-using AgoraGameLogic.Domain.Entities.DataObject;
-using AgoraGameLogic.Domain.Entities.DataObject.ActionCommandDtos;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
+using System;
+using System.Collections.Generic;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Dtos;
+using AgoraGameLogic.Dtos.ActionCommandDtos;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Logic.Blocks.Commands.Actions.Card.PlayInsideZone;
+namespace AgoraGameLogic.Blocks.Actions.PlayCardInsideZone;
 
 public class PlayInsideZoneCommand : ActionCommand<PlayInsideZoneCommand, PlayInsideZoneBlock, OnPlayInsideZoneBlock>
 {

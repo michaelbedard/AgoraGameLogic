@@ -1,11 +1,11 @@
-using AgoraGameLogic.Domain.Entities.BuildDefinition;
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Entities.Utility;
-using AgoraGameLogic.Domain.Extensions;
-using AgoraGameLogic.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Utility.BuildData;
 using Newtonsoft.Json.Linq;
 
-namespace AgoraGameLogic.Control.GameLoader;
+namespace AgoraGameLogic.GameLoader;
 
 public partial class GameLoader
 {

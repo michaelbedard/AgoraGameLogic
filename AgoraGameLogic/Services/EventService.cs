@@ -1,9 +1,13 @@
-using AgoraGameLogic.Domain.Entities.Models;
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks.Values;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AgoraGameLogic.Actors;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Services;
+using AgoraGameLogic.Utility.Commands;
 
-namespace AgoraGameLogic.Control.Services;
+namespace AgoraGameLogic.Services;
 
 
 public class EventService : IEventService

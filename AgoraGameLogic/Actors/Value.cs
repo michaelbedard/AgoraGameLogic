@@ -1,9 +1,10 @@
-using AgoraGameLogic.Domain.Interfaces;
-using AgoraGameLogic.Entities;
-using AgoraGameLogic.Logic.Blocks;
+using System;
+using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Actors;
 using Newtonsoft.Json.Linq;
 
-namespace AgoraGameLogic.Domain.Entities.Utility;
+namespace AgoraGameLogic.Actors;
 
 public class Value<T>
 {
