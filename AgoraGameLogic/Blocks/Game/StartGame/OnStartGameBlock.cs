@@ -14,8 +14,8 @@ public class OnStartGameBlock : EventBlockBase<StartGameCommand>
         Blocks = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[0].AsValidArray(), gameData);
     }
 
-    protected override async Task<Result> TriggerAsync(IContext context, StartGameCommand command, Scope? scope)
+    protected override async Task<Result> TriggerAsync(Scope scope, StartGameCommand command)
     {
-        return await ExecuteSequenceAsync(Blocks, context, scope);
+        return await ExecuteSequenceAsync(Blocks, scope);
     }
 }

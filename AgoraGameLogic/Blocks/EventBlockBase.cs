@@ -14,7 +14,7 @@ public abstract class EventBlockBase : BlockBase
      {
      }
 
-     public abstract Task<Result> TriggerAsync(GameModule? gameModule, IContext context, Command command, Scope? scope);
+     public abstract Task<Result> TriggerAsync(Scope scope, Command command, GameModule? gameModule);
 }
 
 public abstract class EventBlockBase<TCommand> : EventBlockBase
@@ -26,10 +26,10 @@ public abstract class EventBlockBase<TCommand> : EventBlockBase
      {
      }
      
-     protected abstract Task<Result> TriggerAsync(IContext context, TCommand command, Scope? scope);
+     protected abstract Task<Result> TriggerAsync(Scope scope, TCommand command);
 
      // wrapper function
-     public override async Task<Result> TriggerAsync(GameModule? gameModule, IContext context, Command command, Scope? scope)
+     public override async Task<Result> TriggerAsync(Scope scope, Command command, GameModule? gameModule)
      {
           try
           {
@@ -45,17 +45,16 @@ public abstract class EventBlockBase<TCommand> : EventBlockBase
 
                     if (gameModule != null)
                     {
-                         context.AddOrUpdate("this", ref gameModule);
+                         scope.Context.AddOrUpdate("this", ref gameModule);
                     }
 
-                    return await TriggerAsync(context, specificCommand, scope);
+                    return await TriggerAsync(scope, specificCommand);
                }
 
                return Result.Failure($"Called {nameof(TriggerAsync)} with invalid command type.  Expected {typeof(TCommand)} but got {command.Type}", new ErrorBuilder()
                {
                     ClassName = nameof(EventBlockBase),
                     MethodName = nameof(TriggerAsync),
-                    Context = context,
                     GameModule = gameModule,
                     Scope = scope,
                });
@@ -66,7 +65,6 @@ public abstract class EventBlockBase<TCommand> : EventBlockBase
                {
                     ClassName = nameof(EventBlockBase),
                     MethodName = nameof(TriggerAsync),
-                    Context = context,
                     GameModule = gameModule,
                     Scope = scope,
                });

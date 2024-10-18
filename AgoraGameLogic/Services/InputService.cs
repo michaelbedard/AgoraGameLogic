@@ -33,4 +33,11 @@ public class InputService : CommandService<InputCommand>, IInputService
             return Result.Failure(e.Message);
         }
     }
+    
+    protected override Result OnCommandFiltered()
+    {
+        // TODO force an input
+        
+        return Result.Success();
+    }
 }

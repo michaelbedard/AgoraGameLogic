@@ -35,4 +35,9 @@ public class ActionService : CommandService<ActionCommand>, IActionService
             });
         }
     }
+
+    protected override Result OnCommandFiltered()
+    {
+        return Result.Success();
+    }
 }

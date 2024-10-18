@@ -12,7 +12,7 @@ public class OnChoiceBlock : EventBlockBase<ChoiceCommand>
     {
     }
 
-    protected override async Task<Result> TriggerAsync(IContext context, ChoiceCommand command, Scope? scope)
+    protected override async Task<Result> TriggerAsync(Scope scope, ChoiceCommand command)
     {
         throw new NotImplementedException();
     }

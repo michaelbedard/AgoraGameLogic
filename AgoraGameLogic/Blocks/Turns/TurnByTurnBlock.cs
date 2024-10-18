@@ -19,24 +19,24 @@ public class TurnByTurnBlock : TurnBlockBlockBase
         EndBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[2].AsValidArray(), gameData);
     }
 
-    protected override async Task<Result> ExecuteAsync(IContext context)
+    public override async Task<Result> ExecuteAsync(Scope scope)
     {
         try
         {
             var exitCondition = HasOption<ExitConditionTurnBlock>() 
-                ? GetOptionOrThrow<ExitConditionTurnBlock>().GetExitConditionOrThrow(context) 
+                ? GetOptionOrThrow<ExitConditionTurnBlock>().GetExitConditionOrThrow(scope.Context) 
                 : Value<bool>.FromOrThrow(true);
         
             var numberOfRounds = HasOption<NumberOfRoundsTurnOption>() 
-                ? GetOptionOrThrow<NumberOfRoundsTurnOption>().GetNumberOfRoundsOrThrow(context) * Players.Count
+                ? GetOptionOrThrow<NumberOfRoundsTurnOption>().GetNumberOfRoundsOrThrow(scope.Context) * Players.Count
                 : int.MaxValue;
 
             // number of rounds or exit condition
             var currentRound = 0;
-            while (currentRound < numberOfRounds && exitCondition.GetValueOrThrow(context))
+            while (currentRound < numberOfRounds && exitCondition.GetValueOrThrow(scope.Context))
             {
                 // execute player turn
-                var playerTurnResult = await ExecutePlayerTurn(context);
+                var playerTurnResult = await ExecutePlayerTurn(scope.Context);
                 if (!playerTurnResult.IsSuccess)
                 {
                     return Result.Failure(playerTurnResult.Error);
@@ -89,8 +89,24 @@ public class TurnByTurnBlock : TurnBlockBlockBase
         _isClockwise = !_isClockwise;
     }
     
-    public void MakeNextPlayer(GameModule player, bool stopCurrentTurn)
+    public void SetCurrentPlayerIndex(GameModule player, bool stopCurrentTurn)
     {
-        throw new NotImplementedException();
+        // Find the player's index in the player list
+        var playerIndex = Players.FindIndex(p => p.Equals(player));
+
+        if (playerIndex == -1)
+        {
+            throw new ArgumentException("Player not found in the player list");
+        }
+
+        // Set the next player index
+        _currentPlayerIndex = playerIndex;
+
+        // Optionally stop the current turn and force the next player immediately
+        if (stopCurrentTurn)
+        {
+            // Add logic here to immediately end the current player's turn
+            // and proceed to the next player, if necessary
+        }
     }
 }

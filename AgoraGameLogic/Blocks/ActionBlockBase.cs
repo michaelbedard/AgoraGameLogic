@@ -28,12 +28,12 @@ public abstract class ActionBlockBase<TCommand, TBlock, TEvent> : ActionBlockBas
 
     public abstract TCommand GetCommandOrThrow(IContext context);
     
-    protected override async Task<Result> ExecuteAsync(IContext context)
+    public override async Task<Result> ExecuteAsync(Scope scope)
     {
         try
         {
-            var behavior= BehaviorValue.GetValueOrThrow(context);
-            var command = GetCommandOrThrow(context);
+            var behavior= BehaviorValue.GetValueOrThrow(scope.Context);
+            var command = GetCommandOrThrow(scope.Context);
         
             switch (behavior)
             {
@@ -49,7 +49,7 @@ public abstract class ActionBlockBase<TCommand, TBlock, TEvent> : ActionBlockBas
                 }
                 case ActionBehavior.Perform:
                 {
-                    await command.PerformAsync(context, false);
+                    await command.PerformAsync(scope.Context, false);
                     break;
                 }
             }

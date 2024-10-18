@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks.Options.TurnOptions;
+using AgoraGameLogic.Blocks.Turns;
 using AgoraGameLogic.Interfaces.Actors;
 using AgoraGameLogic.Interfaces.Services;
-using AgoraGameLogic.Services;
 using AgoraGameLogic.Utility.BuildData;
 using AgoraGameLogic.Utility.Enums;
 
@@ -20,19 +17,31 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
     private IActionService _actionService;
     private IInputService _inputService;
     
-    // for NumberOfActionOption
-    private Dictionary<GameModule, int> _numberOfActionByPlayer = new Dictionary<GameModule, int>();
+    private Dictionary<GameModule, int> _numberOfActionByPlayer = new Dictionary<GameModule, int>(); // for NumberOfActionOption
+    private Dictionary<GameModule, TurnState> _turnScopeByPlayer = new Dictionary<GameModule, TurnState>();
     
     public TurnBlockBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
         _actionService = gameData.ActionService;
         _inputService = gameData.InputService;
     }
-    
+
+    #region State managemenent
+
     protected async Task<Result> ExecuteStart(IContext context, GameModule player)
     {
-        var startScope = new Scope(this, ScopeType.Start, player.Id);
-        var executeSequenceResult = await ExecuteSequenceAsync(StartBranch, context, startScope);
+        _turnScopeByPlayer[player] = TurnState.Start;
+        
+        // define scope
+        var startScope = new Scope()
+        {
+            Context = context,
+            TurnBlock = this,
+            TurnState = TurnState.Start,
+            Player = player,
+        };
+        
+        var executeSequenceResult = await ExecuteSequenceAsync(StartBranch, startScope);
         if (!executeSequenceResult.IsSuccess)
         {
             return Result.Failure(executeSequenceResult.Error);
@@ -45,25 +54,38 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
     {
         try
         {
-            var numberOfAllowedAction = HasOption<NumberOfActionTurnOption>() ? GetOptionOrThrow<NumberOfActionTurnOption>().GetNumberOfActionOrThrow(context) : 1;
+            _turnScopeByPlayer[player] = TurnState.Update;
+            
+            var numberOfAllowedAction = HasOption<NumberOfActionTurnOption>() 
+                ? GetOptionOrThrow<NumberOfActionTurnOption>().GetNumberOfActionOrThrow(context) 
+                : 1;
+            
             _numberOfActionByPlayer[player] = 0;
         
             while (_numberOfActionByPlayer[player] < numberOfAllowedAction)
             {
                 // remove previous update command for this player
-                FilterCommands(ScopeType.Update, player);
+                FilterCommands(TurnState.Update, player);
         
+                // define update scope
+                var updateScope = new Scope()
+                {
+                    Context = context,
+                    TurnBlock = this,
+                    Player = player,
+                    TurnState = TurnState.Update
+                };
+                
                 // execute update
-                var updateScope = new Scope(this, ScopeType.Update, player.Id);
-                var executeSequenceResult = await ExecuteSequenceAsync(UpdateBranch, context, updateScope);
+                var executeSequenceResult = await ExecuteSequenceAsync(UpdateBranch, updateScope);
                 if (!executeSequenceResult.IsSuccess)
                 {
                     return Result.Failure(executeSequenceResult.Error);
                 }
                 
                 // wait for an action to be made
-                await CompletionSource.Task;
-                ResetCompletionSource();
+                await GetOrCreateCompletionSource(player.Id).Task;
+                ResetCompletionSource(player.Id);
             }
             
             return Result.Success();
@@ -78,19 +100,29 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
     {
         try
         {
+            _turnScopeByPlayer[player] = TurnState.End;
+            
             // remove all commands from start or update
-            FilterCommands(ScopeType.Start, player);
-            FilterCommands(ScopeType.Update, player);
+            FilterCommands(TurnState.Start, player);
+            FilterCommands(TurnState.Update, player);
 
+            // define end scope
+            var endScope = new Scope()
+            {
+                Context = context,
+                TurnBlock = this,
+                Player = player,
+                TurnState = TurnState.End
+            };
+            
             // execute end
-            var endScope = new Scope(this, ScopeType.End, player.Name);
-            var executeSequenceResult = await ExecuteSequenceAsync(EndBranch, context, endScope);
+            var executeSequenceResult = await ExecuteSequenceAsync(EndBranch, endScope);
             if (!executeSequenceResult.IsSuccess)
             {
                 return Result.Failure(executeSequenceResult.Error);
             }
 
-            FilterCommands(ScopeType.End, player);
+            FilterCommands(TurnState.End, player);
             return Result.Success();
         }
         catch (Exception e)
@@ -98,6 +130,8 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
             return Result.Failure(e.Message);
         }
     }
+
+    #endregion
     
     // fwfe
     
@@ -121,9 +155,72 @@ public abstract class TurnBlockBlockBase : StatementBlockBase
         }
     }
 
-    public void FilterCommands(ScopeType scopeType, GameModule player)
+    public void FilterCommands(TurnState turnState, GameModule player)
     {
-        _actionService.FilterActions(this, scopeType, player);
-        _inputService.FilterActions(this, scopeType, player);
+        _actionService.FilterCommands(this, turnState, player);
+        _inputService.FilterCommands(this, turnState, player);
+    }
+
+    public async Task<Result> EndCurrentTurn(Scope scope, GameModule? playerToContinueFrom)
+    {
+        // trigger the remaining steps
+        // if is in Start
+        if (_turnScopeByPlayer[scope.Player] == TurnState.Start)
+        {
+            // filter inputs
+            _inputService.FilterCommands(this, TurnState.Start, scope.Player);
+            
+            // trigger update
+            var updateTask = ExecuteUpdate(scope.Context, scope.Player); // !!!
+            while (!updateTask.IsCompleted)
+            {
+                _inputService.FilterCommands(this, TurnState.Update, scope.Player);
+            }
+        }
+        
+        // filter start and update commands
+        _actionService.FilterCommands(this, TurnState.Start, scope.Player);
+        _inputService.FilterCommands(this, TurnState.Start, scope.Player);
+        _actionService.FilterCommands(this, TurnState.Update, scope.Player);
+        _inputService.FilterCommands(this, TurnState.Update, scope.Player);
+        
+        // 
+        
+        
+        
+        
+        
+        // if is in Update (will be if was in start)
+        if (_turnScopeByPlayer[scope.Player] == TurnState.Update)
+        {
+            // trigger end without waiting
+            scope.TurnState = TurnState.Update;
+            var executeSequenceResult = await ExecuteSequenceAsync(UpdateBranch, scope);
+            if (!executeSequenceResult.IsSuccess)
+            {
+                return Result.Failure(executeSequenceResult.Error);
+            }
+            
+            // trigger update without waiting, only once
+            var updateTask = ExecuteUpdate(scope.Context, scope.Player, false); // should not Await!!!
+            while (!updateTask.IsCompleted)
+            {
+                
+            }
+            
+            if (!updateResult.IsSuccess)
+            {
+                return Result.Failure(updateResult.Error);
+            }
+        }
+        
+        
+        // 
+        if (playerToContinueFrom != null && this is TurnByTurnBlock turnByTurnBlock)
+        {
+            turnByTurnBlock.SetCurrentPlayerIndex(playerToContinueFrom);
+        }
+        
+        // TODO 
     }
 }

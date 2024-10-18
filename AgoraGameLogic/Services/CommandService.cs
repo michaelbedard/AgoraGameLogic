@@ -15,6 +15,8 @@ public abstract class CommandService<TCommand> where TCommand : Command
 {
     protected Dictionary<string, ICommandStore<TCommand>> CommandStoresByPlayerName = new Dictionary<string, ICommandStore<TCommand>>();
     private int _counter = 0;
+
+    protected abstract Result OnCommandFiltered();
     
     public Result PushCommand(TCommand item, GameModule player)
     {
@@ -123,7 +125,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
     }
 
     
-    public Result FilterActions(TurnBlockBlockBase turnBlock, ScopeType scopeType, GameModule player)
+    public Result FilterCommands(TurnBlockBlockBase turnBlock, TurnState turnState, GameModule player)
     {
         try
         {
@@ -143,9 +145,15 @@ public abstract class CommandService<TCommand> where TCommand : Command
                     var scope = command.Scope;
                     if (scope != null && 
                         scope.TurnBlock == turnBlock && 
-                        scope.ScopeType == scopeType && 
+                        scope.TurnState == turnState && 
                         scope.PlayerId == player.Id)
                     {
+                        var onCommandFilteredResult = OnCommandFiltered();
+                        if (!onCommandFilteredResult.IsSuccess)
+                        {
+                            return Result.Failure(onCommandFilteredResult.Error);
+                        }
+                        
                         var removeResult = store.RemoveCommand(command);
                         if (!removeResult.IsSuccess)
                         {

@@ -15,11 +15,11 @@ public class LogBlock : StatementBlockBase
         Data = Value<object>.ParseOrThrow(buildData.Inputs[0], gameData);
     }
 
-    protected override async Task<Result> ExecuteAsync(IContext context)
+    public override async Task<Result> ExecuteAsync(Scope scope)
     {
         try
         {
-            var dataResult = Data.GetValue(context);
+            var dataResult = Data.GetValue(scope.Context);
             if (!dataResult.IsSuccess)
             {
                 return Result.Failure(dataResult.Error);
@@ -33,7 +33,7 @@ public class LogBlock : StatementBlockBase
             return Result.Failure($"Unexpected Error: {e.Message}", new ErrorBuilder()
             {
                 ClassName = nameof(LogBlock),
-                Context = context
+                Scope = scope
             });
         }
     }

@@ -23,21 +23,21 @@ public class ForeachBlock : StatementBlockBase
         _loopBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[2].AsValidArray(), gameData);
     }
 
-    protected override async Task<Result> ExecuteAsync(IContext context)
+    public override async Task<Result> ExecuteAsync(Scope scope)
     {
         try
         {
-            var key = _key.GetValueOrThrow(context);
-            var enumerable = _enumerable.GetValueOrThrow(context).ToList();
+            var key = _key.GetValueOrThrow(scope.Context);
+            var enumerable = _enumerable.GetValueOrThrow(scope.Context).ToList();
 
             for (var i = 0; i < enumerable.Count(); i++)
             {
-                var contextCopy = context.Copy();
+                var contextCopy = scope.Context.Copy();
                 var item = enumerable[i];
 
                 contextCopy.AddOrUpdate(key, ref item);
 
-                await ExecuteSequenceOrThrowAsync(_loopBranch, context, Scope);
+                await ExecuteSequenceOrThrowAsync(_loopBranch, scope);
             }
             
             return Result.Success();

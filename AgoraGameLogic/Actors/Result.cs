@@ -64,7 +64,6 @@ namespace AgoraGameLogic.Actors
         public string? ClassName { get; set; }
         public string? MethodName { get; set; }
         public GameModule? GameModule { get; set; }
-        public IContext? Context { get; set; }
         public Scope? Scope { get; set; }
         public string? Details { get; set; }
 
@@ -88,11 +87,6 @@ namespace AgoraGameLogic.Actors
                 builder.AppendLine($"GameModule: " + GameModule.ToString());
             }
             
-            if (Context != null)
-            {
-                builder.AppendLine($"Context: " + Context.ToString());
-            }
-
             if (Scope != null)
             {
                 builder.AppendLine($"Context: " + Scope.ToString());

@@ -22,8 +22,10 @@ public abstract class StatementBlockBase : BlockBase
     private IInputService _inputService;
     private IEventService _eventService;
     
+    private TaskCompletionSource<bool> _completionSource;
+    private Dictionary<string, TaskCompletionSource<bool>> _completionSourceByKey;
+    
     public Scope? Scope;
-    public TaskCompletionSource<bool> CompletionSource;
     
     protected StatementBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
@@ -34,25 +36,26 @@ public abstract class StatementBlockBase : BlockBase
         _inputService = gameData.InputService;
         _eventService = gameData.EventService;
 
-        CompletionSource = new TaskCompletionSource<bool>();
+        _completionSource = new TaskCompletionSource<bool>();
+        _completionSourceByKey = new Dictionary<string, TaskCompletionSource<bool>>();
     }
     
     // ABSTRACT
 
-    protected abstract Task<Result> ExecuteAsync(IContext context);
+    public abstract Task<Result> ExecuteAsync(Scope scope);
     
     // METHODS
     
-    #region EXECUTION
-    
-    public Task<Result> ExecuteAsync(IContext context, Scope? scope)
-    {
-        Scope = scope;
-        return ExecuteAsync(context);
-    }
-    
-    
-    #endregion
+    // #region EXECUTION
+    //
+    // public Task<Result> ExecuteAsync(Scope scope)
+    // {
+    //     Scope = scope;
+    //     return ExecuteAsync(context);
+    // }
+    //
+    //
+    // #endregion
     
     #region EVENTS
 
@@ -112,32 +115,65 @@ public abstract class StatementBlockBase : BlockBase
 
     #region AWAIT
 
+    public TaskCompletionSource<bool> GetOrCreateCompletionSource()
+    {
+        return _completionSource;
+    }
+    
+    public TaskCompletionSource<bool> GetOrCreateCompletionSource(string key)
+    {
+        if (!_completionSourceByKey.ContainsKey(key))
+        {
+            _completionSourceByKey[key] = new TaskCompletionSource<bool>();
+        }
+        
+        return _completionSourceByKey[key];
+    }
+
     public void ValidateCompletionSource()
     {
-        if (!CompletionSource.Task.IsCompleted)
+        var completionSource = GetOrCreateCompletionSource();
+        if (!completionSource.Task.IsCompleted)
         {
-            CompletionSource.SetResult(true);
+            completionSource.SetResult(true);
+        }
+    }
+    
+    public void ValidateCompletionSource(string key)
+    {
+        var completionSource = GetOrCreateCompletionSource(key);
+        if (!completionSource.Task.IsCompleted)
+        {
+            completionSource.SetResult(true);
         }
     }
     
     public void ResetCompletionSource()
     {
-        CompletionSource = new TaskCompletionSource<bool>();
-    }
-
-    #endregion
-
-    #region Sequence
-
-    protected async Task<Result> ExecuteSequenceAsync(StatementBlockBase[] blocks, IContext context)
-    {
-        return await ExecuteSequenceAsync(blocks, context, Scope);
+        _completionSource = new TaskCompletionSource<bool>();
     }
     
-    protected async Task ExecuteSequenceOrThrowAsync(StatementBlockBase[] blocks, IContext context)
+    public void ResetCompletionSource(string key)
     {
-        await ExecuteSequenceOrThrowAsync(blocks, context, Scope);
+        if (_completionSourceByKey.ContainsKey(key))
+        {
+            _completionSourceByKey[key] = new TaskCompletionSource<bool>();
+        }
     }
 
     #endregion
+
+    // #region Sequence
+    //
+    // protected async Task<Result> ExecuteSequenceAsync(StatementBlockBase[] blocks, Scope scope)
+    // {
+    //     return await ExecuteSequenceAsync(blocks, context, Scope);
+    // }
+    //
+    // protected async Task ExecuteSequenceOrThrowAsync(StatementBlockBase[] blocks, IContext context)
+    // {
+    //     await ExecuteSequenceOrThrowAsync(blocks, context, Scope);
+    // }
+    //
+    // #endregion
 }

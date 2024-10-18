@@ -14,11 +14,11 @@ public class OnPlayCardBlock : EventBlockBase<PlayCardCommand>
         Blocks = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[0].AsValidArray(), gameData);
     }
 
-    protected override async Task<Result> TriggerAsync(IContext context, PlayCardCommand command, Scope? scope)
+    protected override async Task<Result> TriggerAsync(Scope scope, PlayCardCommand command)
     {
-        context.AddOrUpdate("Player", command.Target);
-        context.AddOrUpdate("Card", command.Card);
+        scope.Context.AddOrUpdate("Player", command.Target);
+        scope.Context.AddOrUpdate("Card", command.Card);
         
-        return await ExecuteSequenceAsync(Blocks, context, scope);
+        return await ExecuteSequenceAsync(Blocks, scope);
     }
 }

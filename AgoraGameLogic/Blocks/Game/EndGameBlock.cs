@@ -18,14 +18,14 @@ public class EndGameBlock : StatementBlockBase
         _method = Value<EndGameMethod>.ParseOrThrow(buildData.Inputs[0], gameData);
     }
 
-    protected override async Task<Result> ExecuteAsync(IContext context)
+    public override async Task<Result> ExecuteAsync(Scope scope)
     {
         try
         {
             GameModule[] winners;
             object[] args;
 
-            var method = _method.GetValueOrThrow(context);
+            var method = _method.GetValueOrThrow(scope.Context);
             switch (method)
             {
                 case EndGameMethod.LeastCardsInHand:

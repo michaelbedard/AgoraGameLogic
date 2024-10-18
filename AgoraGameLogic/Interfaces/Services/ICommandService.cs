@@ -13,7 +13,7 @@ public interface ICommandService<T> where T : Command
     Result PullCommand(T item, GameModule player);
     Result RemoveCommand(int commandId);
     Result<T> GetCommand(string playerName, int commandId);
-    Result FilterActions(TurnBlockBlockBase turnBlock, ScopeType scopeType, GameModule player);
+    Result FilterCommands(TurnBlockBlockBase turnBlock, TurnState turnState, GameModule player);
     Result<Dictionary<string, CommandDto[]>> GetDtos();
     Result InitializeDictionaryEntries(List<GameModule> players);
 }

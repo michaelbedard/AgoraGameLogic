@@ -12,7 +12,7 @@ public class OnShuffleDeckBlock : EventBlockBase<ShuffleDeckCommand>
     {
     }
 
-    protected override async Task<Result> TriggerAsync(IContext context, ShuffleDeckCommand command, Scope? scope)
+    protected override async Task<Result> TriggerAsync(Scope context, ShuffleDeckCommand command)
     {
         throw new NotImplementedException();
     }

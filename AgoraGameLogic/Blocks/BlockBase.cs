@@ -78,11 +78,11 @@ public abstract class BlockBase
     
     // SEQUENCE
     
-    protected async Task<Result> ExecuteSequenceAsync(StatementBlockBase[] blocks, IContext context, Scope? scope)
+    protected async Task<Result> ExecuteSequenceAsync(StatementBlockBase[] blocks, Scope scope)
     {
         foreach (var block in blocks)
         {
-            var executeResult = await block.ExecuteAsync(context, scope);
+            var executeResult = await block.ExecuteAsync(scope);
             if (!executeResult.IsSuccess)
             {
                 return Result.Failure(executeResult.Error);
@@ -92,9 +92,9 @@ public abstract class BlockBase
         return Result.Success();
     }
     
-    protected async Task ExecuteSequenceOrThrowAsync(StatementBlockBase[] blocks, IContext context, Scope? scope)
+    protected async Task ExecuteSequenceOrThrowAsync(StatementBlockBase[] blocks, Scope scope)
     {
-        var executeSequenceResult = await ExecuteSequenceAsync(blocks, context, scope);
+        var executeSequenceResult = await ExecuteSequenceAsync(blocks, scope);
         if (!executeSequenceResult.IsSuccess)
         {
             throw new Exception(executeSequenceResult.Error);

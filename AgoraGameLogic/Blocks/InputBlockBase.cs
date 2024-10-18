@@ -25,11 +25,11 @@ public abstract class InputBlockBase<TCommand, TBlock, TEvent> : InputBlockBase
     
     public abstract TCommand GetCommandOrThrow(IContext context);
     
-    protected override async Task<Result> ExecuteAsync(IContext context)
+    public override async Task<Result> ExecuteAsync(Scope scope)
     {
         try
         {
-            var command = GetCommandOrThrow(context);
+            var command = GetCommandOrThrow(scope.Context);
             PushInputOrThrow(command).For(command.Target);
 
             // wait for response
