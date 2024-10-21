@@ -1,9 +1,6 @@
-using System;
-using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Interfaces.Actors;
 using AgoraGameLogic.Interfaces.Other;
-using AgoraGameLogic.Interfaces.Services;
 using AgoraGameLogic.Utility.BuildData;
 using AgoraGameLogic.Utility.Commands;
 using AgoraGameLogic.Utility.Enums;
@@ -15,53 +12,43 @@ namespace AgoraGameLogic.Blocks;
 /// Statement blocks can trigger animations and events
 /// 
 /// </summary>
-public abstract class StatementBlockBase : BlockBase
+public abstract class StatementBlock : Block
 {
-    private IAnimationService _animationService;
-    private IActionService _actionService;
-    private IInputService _inputService;
-    private IEventService _eventService;
-    
     private TaskCompletionSource<bool> _completionSource;
     private Dictionary<string, TaskCompletionSource<bool>> _completionSourceByKey;
     
-    public Scope? Scope;
-    
-    protected StatementBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
+    protected StatementBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
         BlockType = BlockType.StatementBlock;
         
-        _animationService = gameData.AnimationService;
-        _actionService = gameData.ActionService;
-        _inputService = gameData.InputService;
-        _eventService = gameData.EventService;
-
         _completionSource = new TaskCompletionSource<bool>();
         _completionSourceByKey = new Dictionary<string, TaskCompletionSource<bool>>();
     }
     
     // ABSTRACT
 
-    public abstract Task<Result> ExecuteAsync(Scope scope);
+    protected abstract Task<Result> ExecuteAsyncCore();
     
     // METHODS
     
-    // #region EXECUTION
-    //
-    // public Task<Result> ExecuteAsync(Scope scope)
-    // {
-    //     Scope = scope;
-    //     return ExecuteAsync(context);
-    // }
-    //
-    //
-    // #endregion
+    #region EXECUTION
+    
+    public Task<Result> ExecuteAsync(IContext context, TurnScope? scope)
+    {
+        SetUpContext(context);
+        SetUpScope(scope);
+        
+        return ExecuteAsyncCore();
+    }
+    
+    
+    #endregion
     
     #region EVENTS
 
-    public async Task<Result> TriggerEventsAsync<T>(IContext context, Command command) where T : EventBlockBase
+    public async Task<Result> TriggerEventsAsync<T>(Command command) where T : EventBlock
     {
-        return await _eventService.TriggerEventsAsync<T>(context, command, Scope);
+        return await EventService.TriggerEventsAsync<T>(Scope, command);
     }
 
     #endregion
@@ -70,7 +57,7 @@ public abstract class StatementBlockBase : BlockBase
 
     public PendingRequest<AnimationCommand> PushAnimationOrThrow(AnimationCommand animationCommand)
     {
-        return new PendingRequest<AnimationCommand>(animationCommand, _animationService, Players);
+        return new PendingRequest<AnimationCommand>(animationCommand, AnimationService, Players);
         
     }
 
@@ -80,12 +67,12 @@ public abstract class StatementBlockBase : BlockBase
 
     public PendingRequest<ActionCommand> PushActionOrThrow(ActionCommand actionCommand)
     {
-        return new PendingRequest<ActionCommand>(actionCommand, _actionService, Players);
+        return new PendingRequest<ActionCommand>(actionCommand, ActionService, Players);
     }
     
     public PendingRequest<ActionCommand> PullActionOrThrow(ActionCommand actionCommand)
     {
-        return new PendingRequest<ActionCommand>(actionCommand, _actionService, Players, false);
+        return new PendingRequest<ActionCommand>(actionCommand, ActionService, Players, false);
     }
 
     #endregion
@@ -94,12 +81,12 @@ public abstract class StatementBlockBase : BlockBase
     
     public PendingRequest<InputCommand> PushInputOrThrow(InputCommand inputCommand)
     {
-        return new PendingRequest<InputCommand>(inputCommand, _inputService, Players);
+        return new PendingRequest<InputCommand>(inputCommand, InputService, Players);
     }
     
     public PendingRequest<InputCommand> PullInputOrThrow(InputCommand inputCommand)
     {
-        return new PendingRequest<InputCommand>(inputCommand, _inputService, Players, false);
+        return new PendingRequest<InputCommand>(inputCommand, InputService, Players, false);
     }
 
     #endregion
@@ -162,18 +149,4 @@ public abstract class StatementBlockBase : BlockBase
     }
 
     #endregion
-
-    // #region Sequence
-    //
-    // protected async Task<Result> ExecuteSequenceAsync(StatementBlockBase[] blocks, Scope scope)
-    // {
-    //     return await ExecuteSequenceAsync(blocks, context, Scope);
-    // }
-    //
-    // protected async Task ExecuteSequenceOrThrowAsync(StatementBlockBase[] blocks, IContext context)
-    // {
-    //     await ExecuteSequenceOrThrowAsync(blocks, context, Scope);
-    // }
-    //
-    // #endregion
 }

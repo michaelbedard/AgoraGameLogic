@@ -20,4 +20,14 @@ public static class ListExtensions
             list[n] = value;
         }
     }
+    
+    // Method to get a random element from a list
+    public static T GetRandom<T>(this IList<T> list)
+    {
+        if (list == null || list.Count == 0)
+            throw new InvalidOperationException("Cannot get a random element from an empty or null list.");
+
+        var index = rng.Next(list.Count);
+        return list[index];
+    }
 }

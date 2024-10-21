@@ -5,7 +5,7 @@ using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.Blocks.Options.TurnOptions;
 
-public class NumberOfActionTurnOption : OptionBlockBase
+public class NumberOfActionTurnOption : OptionBlock
 {
     private Value<int> _numberOfActionValue;
     

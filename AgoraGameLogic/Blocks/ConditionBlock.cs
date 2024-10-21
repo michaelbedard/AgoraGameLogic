@@ -2,16 +2,24 @@ using System;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Interfaces.Actors;
 using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks;
 
-public abstract class ConditionBlockBase : BlockBase
+public abstract class ConditionBlock : Block
 {
-    protected ConditionBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
+    protected ConditionBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
+        BlockType = BlockType.ConditionBlock;
     }
     
-    public abstract Result<bool> IsSatisfied(IContext context);
+    protected abstract Result<bool> IsSatisfiedCore();
+    
+    public Result<bool> IsSatisfied(IContext context)
+    {
+        SetUpContext(context);
+        return IsSatisfiedCore();
+    }
 
     public bool IsSatisfiedOrThrow(IContext context)
     {

@@ -7,19 +7,19 @@ using AgoraGameLogic.Utility.Extensions;
 
 namespace AgoraGameLogic.Blocks.Actions.PlayCardInsideZone;
 
-public class OnPlayInsideZoneBlock : EventBlockBase<PlayInsideZoneCommand>
+public class OnPlayInsideZoneBlock : EventBlock<PlayInsideZoneCommand>
 {
     public OnPlayInsideZoneBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        Blocks = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[0].AsValidArray(), gameData);
+        Blocks = BlockFactory.CreateArrayOrThrow<StatementBlock>(buildData.Inputs[0].AsValidArray(), gameData);
     }
 
-    protected override async Task<Result> TriggerAsync(Scope scope, PlayInsideZoneCommand command)
+    protected override async Task<Result> TriggerAsync(TurnScope turnScope, PlayInsideZoneCommand command)
     {
-        scope.Context.AddOrUpdate("Player", ref command.Target);
-        scope.Context.AddOrUpdate("Card", ref command.Card);
-        scope.Context.AddOrUpdate("Zone", ref command.Zone);
+        turnScope.Context.AddOrUpdate("Player", ref command.Target);
+        turnScope.Context.AddOrUpdate("Card", ref command.Card);
+        turnScope.Context.AddOrUpdate("Zone", ref command.Zone);
 
-        return await ExecuteSequenceAsync(Blocks, scope);
+        return await ExecuteSequenceAsync(Blocks, turnScope);
     }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Interfaces.Actors;
 using AgoraGameLogic.Interfaces.Services;
@@ -9,7 +7,7 @@ namespace AgoraGameLogic.Services;
 
 public class InputService : CommandService<InputCommand>, IInputService
 {
-    public async Task<Result> PerformInput(IContext context, string playerName, int id, object? answer)
+    public async Task<Result> ResolveInputAsync(IContext context, string playerName, int id, object? answer)
     {
         try
         {
@@ -25,7 +23,7 @@ public class InputService : CommandService<InputCommand>, IInputService
                 return Result.Failure(removeResult.Error);
             }
         
-            var performResult = await commandResult.Value.PerformAsync(context, answer, true);
+            var performResult = await commandResult.Value.ResolveAsync(answer);
             return performResult.IsSuccess ? Result.Success() : Result.Failure(performResult.Error);
         }
         catch (Exception e)
@@ -33,11 +31,32 @@ public class InputService : CommandService<InputCommand>, IInputService
             return Result.Failure(e.Message);
         }
     }
-    
-    protected override Result OnCommandFiltered()
+
+    public bool HasUnresolvedInputs(GameModule player)
     {
-        // TODO force an input
+        var store = CommandStoresByPlayerName[player.Id].GetAllCommands();
+        if (!store.IsSuccess)
+        {
+            throw new Exception($"cannot get all commands for {player.Id}");
+        }
+
+        return store.Value.ToList().Exists(c => c.IsPriority);
+    }
+
+    public async Task<Result> ResolveNextInput(GameModule player)
+    {
+        var store = CommandStoresByPlayerName[player.Id].GetAllCommands();
+        if (!store.IsSuccess)
+        {
+            throw new Exception($"cannot get all commands for {player.Id}");
+        }
         
+        var nextCommand =  store.Value.ToList().FirstOrDefault(c => c.IsPriority);
+        if (nextCommand != null)
+        {
+            return await nextCommand.ResolveDefaultAsync();
+        }
+
         return Result.Success();
     }
 }

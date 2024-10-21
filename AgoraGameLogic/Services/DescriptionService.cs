@@ -40,7 +40,7 @@ public class DescriptionService : IDescriptionService
                 else if (descriptionJToken.HasValues)
                 {
                     // append block part (variable)
-                    var valueBlockResult = BlockFactory.Create<ValueBlockBase>(descriptionJToken, gameData);
+                    var valueBlockResult = BlockFactory.Create<ValueBlock>(descriptionJToken, gameData);
                     if (!valueBlockResult.IsSuccess)
                     {
                         return Result.Failure(valueBlockResult.Error);
@@ -130,7 +130,7 @@ public class DescriptionService : IDescriptionService
                     // Append string segment
                     resolvedDescription.Append(textSegment);
                 }
-                else if (segment is ValueBlockBase valueBlock)
+                else if (segment is ValueBlock valueBlock)
                 {
                     // Resolve the value block
                     var value = valueBlock.GetValue<object>(context);

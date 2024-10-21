@@ -4,7 +4,7 @@ using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.Blocks.Options.TurnOptions;
 
-public class ExitConditionTurnBlock : OptionBlockBase
+public class ExitConditionTurnBlock : OptionBlock
 {
     private Value<bool> _exitConditionValue;
     

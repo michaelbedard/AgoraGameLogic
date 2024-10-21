@@ -1,7 +1,5 @@
-using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks;
-using AgoraGameLogic.Blocks.Turns;
 using AgoraGameLogic.Dtos;
 using AgoraGameLogic.Interfaces.Actors;
 
@@ -9,46 +7,46 @@ namespace AgoraGameLogic.Utility.Commands;
 
 public abstract class ActionCommand : Command
 {
-    public abstract Task<Result> PerformAsync(IContext context, bool shouldRegisterAction);
+    public abstract Task<Result> PerformAsync(bool shouldRegisterAction);
 }
 
 public abstract class ActionCommand<TCommand, TBlock, TEvent> : ActionCommand
     where TCommand : ActionCommand<TCommand, TBlock, TEvent>
-    where TBlock : ActionBlockBase<TCommand, TBlock, TEvent>
-    where TEvent : EventBlockBase
+    where TBlock : ActionBlock<TCommand, TBlock, TEvent>
+    where TEvent : EventBlock
 {
     public TBlock ActionBlock;
 
-    public ActionCommand(TBlock actionBlockStatementBlock, Scope? scope)
+    public ActionCommand(TBlock actionBlockStatementBlock, TurnScope? scope)
     {
         ActionBlock = actionBlockStatementBlock;
         Type = typeof(TBlock);
         Scope = scope;
     }
     
-    public abstract Result Perform(TCommand command, IContext context);
-    public abstract Result Revert(TCommand command, IContext context);
-    public abstract CommandDto InitializeDto();
+    public abstract Result Perform();
+    public abstract Result Revert();
+    public abstract CommandDto GetDtoCore();
 
     #region Wrappers
 
     /// <summary>
     /// PerformAsync
     /// </summary>
-    public override async Task<Result> PerformAsync(IContext context, bool shouldRegisterAction)
+    public override async Task<Result> PerformAsync(bool shouldRegisterAction)
     {
         // perform
-        var performResult = Perform((TCommand)this, context);
+        var performResult = Perform();
         if (!performResult.IsSuccess)
         {
-            return Result.Failure($"Error while performing {nameof(TCommand)}: {performResult.Error}");
+            return Result.Failure($"Error while performing {typeof(TCommand).Name}: {performResult.Error}");
         }
         
         // events
-        var triggerEventResult = await ActionBlock.TriggerEventsAsync<TEvent>(context, (TCommand)this);
+        var triggerEventResult = await ActionBlock.TriggerEventsAsync<TEvent>((TCommand)this);
         if (!triggerEventResult.IsSuccess)
         {
-            return Result.Failure($"Error while triggering events for {nameof(TCommand)}: {triggerEventResult.Error}");
+            return Result.Failure($"Error while triggering events for {typeof(TCommand).Name}: {triggerEventResult.Error}");
         }
 
         // check if shouldRegisterAction
@@ -104,7 +102,7 @@ public abstract class ActionCommand<TCommand, TBlock, TEvent> : ActionCommand
     /// </summary>
     public override CommandDto GetDto()
     {
-        var temp = InitializeDto();
+        var temp = GetDtoCore();
         temp.Id = Id;
         temp.Key = typeof(TCommand).Name;
         temp.Options = Options;

@@ -5,7 +5,7 @@ using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.Blocks.Operators;
 
-public class EqualsBlock : ConditionBlockBase
+public class EqualsBlock : ConditionBlock
 {
     private Value<object> _firstValue;
     private Value<object> _secondValue;
@@ -16,17 +16,17 @@ public class EqualsBlock : ConditionBlockBase
         _secondValue = Value<object>.ParseOrThrow(buildData.Inputs[1], gameData);
     }
 
-    public override Result<bool> IsSatisfied(IContext context)
+    protected override Result<bool> IsSatisfiedCore()
     {
         try
         {
-            var firstResult= _firstValue.GetValue(context);
+            var firstResult= _firstValue.GetValue(Context);
             if (!firstResult.IsSuccess)
             {
                 return Result<bool>.Failure(firstResult.Error);
             }
             
-            var secondResult = _secondValue.GetValue(context);
+            var secondResult = _secondValue.GetValue(Context);
             if (!secondResult.IsSuccess)
             {
                 return Result<bool>.Failure(secondResult.Error);

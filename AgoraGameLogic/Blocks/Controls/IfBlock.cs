@@ -8,24 +8,24 @@ using AgoraGameLogic.Utility.Extensions;
 
 namespace AgoraGameLogic.Blocks.Controls;
 
-public class IfBlock : StatementBlockBase
+public class IfBlock : StatementBlock
 {
-    private ConditionBlockBase _condition;
-    private StatementBlockBase[] _trueBranch;
+    private ConditionBlock _condition;
+    private StatementBlock[] _trueBranch;
     
     public IfBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        _condition = BlockFactory.CreateOrThrow<ConditionBlockBase>(buildData.Inputs[0], gameData);
-        _trueBranch = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[1].AsValidArray(), gameData);
+        _condition = BlockFactory.CreateOrThrow<ConditionBlock>(buildData.Inputs[0], gameData);
+        _trueBranch = BlockFactory.CreateArrayOrThrow<StatementBlock>(buildData.Inputs[1].AsValidArray(), gameData);
     }
 
-    public override async Task<Result> ExecuteAsync(Scope scope)
+    public override async Task<Result> ExecuteAsync()
     {
         try
         {
-            if (_condition.IsSatisfiedOrThrow(scope.Context))
+            if (_condition.IsSatisfiedOrThrow(TurnScope.Context))
             {
-                return await ExecuteSequenceAsync(_trueBranch, scope); // this return a result
+                return await ExecuteSequenceAsync(_trueBranch, TurnScope); // this return a result
             }
 
             return Result.Success();

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks;
 using AgoraGameLogic.Core.Entities.Utility;
@@ -13,11 +10,16 @@ namespace AgoraGameLogic.Services;
 
 public abstract class CommandService<TCommand> where TCommand : Command
 {
+    protected IContext GlobalContext;
+    
     protected Dictionary<string, ICommandStore<TCommand>> CommandStoresByPlayerName = new Dictionary<string, ICommandStore<TCommand>>();
     private int _counter = 0;
 
-    protected abstract Result OnCommandFiltered();
-    
+    public void SetGlobalContext(IContext context)
+    {
+        GlobalContext = context;
+    }
+
     public Result PushCommand(TCommand item, GameModule player)
     {
         try
@@ -125,7 +127,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
     }
 
     
-    public Result FilterCommands(TurnBlockBlockBase turnBlock, TurnState turnState, GameModule player)
+    public Result FilterCommands(TurnScope scope)
     {
         try
         {
@@ -142,18 +144,8 @@ public abstract class CommandService<TCommand> where TCommand : Command
                 // for each command, remove command if scope is similar
                 foreach (var command in allCommandsResult.Value)
                 {
-                    var scope = command.Scope;
-                    if (scope != null && 
-                        scope.TurnBlock == turnBlock && 
-                        scope.TurnState == turnState && 
-                        scope.PlayerId == player.Id)
+                    if (scope.Equals(command.Scope))
                     {
-                        var onCommandFilteredResult = OnCommandFiltered();
-                        if (!onCommandFilteredResult.IsSuccess)
-                        {
-                            return Result.Failure(onCommandFilteredResult.Error);
-                        }
-                        
                         var removeResult = store.RemoveCommand(command);
                         if (!removeResult.IsSuccess)
                         {

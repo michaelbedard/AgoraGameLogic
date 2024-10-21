@@ -6,13 +6,13 @@ using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.Blocks.Actions.ShuffleDeck;
 
-public class OnShuffleDeckBlock : EventBlockBase<ShuffleDeckCommand>
+public class OnShuffleDeckBlock : EventBlock<ShuffleDeckCommand>
 {
     public OnShuffleDeckBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
     }
 
-    protected override async Task<Result> TriggerAsync(Scope context, ShuffleDeckCommand command)
+    protected override async Task<Result> TriggerAsync(TurnScope context, ShuffleDeckCommand command)
     {
         throw new NotImplementedException();
     }

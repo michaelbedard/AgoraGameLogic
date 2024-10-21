@@ -1,7 +1,4 @@
-using System;
-using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
-using AgoraGameLogic.Interfaces.Actors;
 using AgoraGameLogic.Interfaces.Services;
 using AgoraGameLogic.Utility.Commands;
 
@@ -9,23 +6,26 @@ namespace AgoraGameLogic.Services;
 
 public class ActionService : CommandService<ActionCommand>, IActionService
 {
-    public async Task<Result> PerformActionAsync(IContext context, string playerId, int id)
+    public async Task<Result> PerformActionAsync(string playerId, int id)
     {
         try
         {
+            // get the command
             var commandResult = GetCommand(playerId, id);
             if (!commandResult.IsSuccess)
             {
                 return Result.Failure(commandResult.Error);
             }
 
+            // remove the command
             var removeResult = RemoveCommand(id);
             if (!removeResult.IsSuccess)
             {
                 return Result.Failure(removeResult.Error);
             }
 
-            return await commandResult.Value.PerformAsync(context, true);
+            // perform command
+            return await commandResult.Value.PerformAsync(true);
         }
         catch (Exception e)
         {
@@ -36,8 +36,20 @@ public class ActionService : CommandService<ActionCommand>, IActionService
         }
     }
 
-    protected override Result OnCommandFiltered()
+    public async Task<Result> ForcePerformActionAsync(string playerId)
     {
-        return Result.Success();
+        var store = CommandStoresByPlayerName[playerId].GetAllCommands();
+        if (!store.IsSuccess)
+        {
+            return Result.Failure($"cannot get all commands for {playerId}");
+        }
+
+        var allowedActions = store.Value.ToList();
+        if (allowedActions.Count == 0)
+        {
+            return Result.Failure($"{playerId} do not have actions.  Cannot force");
+        }
+
+        return await allowedActions[0].PerformAsync(true);
     }
 }

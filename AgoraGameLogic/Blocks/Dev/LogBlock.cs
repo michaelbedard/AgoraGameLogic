@@ -6,7 +6,7 @@ using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.Blocks.Dev;
 
-public class LogBlock : StatementBlockBase
+public class LogBlock : StatementBlock
 {
     private Value<object> Data { get; set; }
 
@@ -15,11 +15,11 @@ public class LogBlock : StatementBlockBase
         Data = Value<object>.ParseOrThrow(buildData.Inputs[0], gameData);
     }
 
-    public override async Task<Result> ExecuteAsync(Scope scope)
+    public override async Task<Result> ExecuteAsync()
     {
         try
         {
-            var dataResult = Data.GetValue(scope.Context);
+            var dataResult = Data.GetValue(TurnScope.Context);
             if (!dataResult.IsSuccess)
             {
                 return Result.Failure(dataResult.Error);
@@ -33,7 +33,7 @@ public class LogBlock : StatementBlockBase
             return Result.Failure($"Unexpected Error: {e.Message}", new ErrorBuilder()
             {
                 ClassName = nameof(LogBlock),
-                Scope = scope
+                Scope = TurnScope
             });
         }
     }

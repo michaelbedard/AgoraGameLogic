@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks;
 using AgoraGameLogic.Interfaces.Actors;
@@ -15,10 +12,17 @@ public class EventService : IEventService
     private Dictionary<GameModule, EventStore> _eventStoreByModule = new Dictionary<GameModule, EventStore>();
     private EventStore _globalEventStore = new EventStore();
 
+    private IContext _globalContext;
+
+    public void SetGlobalContext(IContext context)
+    {
+        _globalContext = context;
+    }
+
     /// <summary>
     /// Registers an event block for a specific game module.
     /// </summary>
-    public Result RegisterModuleEvent(GameModule gameModule, EventBlockBase eventBlock)
+    public Result RegisterModuleEvent(GameModule gameModule, EventBlock eventBlock)
     {
         try
         {
@@ -43,7 +47,7 @@ public class EventService : IEventService
     /// <summary>
     /// Registers a global event block.
     /// </summary>
-    public Result RegisterGlobalEvent(EventBlockBase eventBlock)
+    public Result RegisterGlobalEvent(EventBlock eventBlock)
     {
         try
         {
@@ -63,7 +67,7 @@ public class EventService : IEventService
     /// <summary>
     /// Triggers events asynchronously and returns a Result.
     /// </summary>
-    public async Task<Result> TriggerEventsAsync<T>(IContext context, Command command, Scope? scope) where T : EventBlockBase
+    public async Task<Result> TriggerEventsAsync<T>(TurnScope scope, Command command) where T : EventBlock
     {
         try
         {
@@ -75,10 +79,10 @@ public class EventService : IEventService
 
                 foreach (var eventBlock in events)
                 {
-                    var result = await eventBlock.TriggerAsync(gameModule, context, command, scope);
+                    var result = await eventBlock.TriggerAsync(_globalContext.Copy(), scope, command, gameModule);
                     if (!result.IsSuccess)
                     {
-                        return Result.Failure($"Failed to trigger module event: {result.Error}");
+                        return Result.Failure(result.Error);
                     }
                 }
             }
@@ -87,10 +91,10 @@ public class EventService : IEventService
             var globalEvents = _globalEventStore.GetEvents(typeof(T));
             foreach (var eventBlock in globalEvents)
             {
-                var result = await eventBlock.TriggerAsync(null, context, command, scope);
+                var result = await eventBlock.TriggerAsync(_globalContext.Copy(), scope, command, null);
                 if (!result.IsSuccess)
                 {
-                    return Result.Failure($"Failed to trigger global event: {result.Error}");
+                    return Result.Failure(result.Error);
                 }
             }
 
@@ -98,7 +102,7 @@ public class EventService : IEventService
         }
         catch (Exception ex)
         {
-            return Result.Failure($"Unexpected error while triggering events: {ex.Message}");
+            return Result.Failure(ex.Message);
         }
     }
     
@@ -107,31 +111,31 @@ public class EventService : IEventService
     /// </summary>
     private class EventStore
     {
-        private readonly Dictionary<Type, List<EventBlockBase>> _eventsByType;
+        private readonly Dictionary<Type, List<EventBlock>> _eventsByType;
 
         public EventStore()
         {
-            _eventsByType = new Dictionary<Type, List<EventBlockBase>>();
+            _eventsByType = new Dictionary<Type, List<EventBlock>>();
         }
 
-        public void AddEvent(Type eventType, EventBlockBase eventBlock)
+        public void AddEvent(Type eventType, EventBlock eventBlock)
         {
             if (!_eventsByType.ContainsKey(eventType))
             {
-                _eventsByType[eventType] = new List<EventBlockBase>();
+                _eventsByType[eventType] = new List<EventBlock>();
             }
 
             _eventsByType[eventType].Add(eventBlock);
         }
 
-        public List<EventBlockBase> GetEvents(Type eventType)
+        public List<EventBlock> GetEvents(Type eventType)
         {
             if (_eventsByType.TryGetValue(eventType, out var eventBlocks))
             {
                 return eventBlocks;
             }
 
-            return new List<EventBlockBase>();
+            return new List<EventBlock>();
         }
     }
 }

@@ -7,5 +7,6 @@ namespace AgoraGameLogic.Interfaces.Services;
 
 public interface IActionService : ICommandService<ActionCommand>
 {
-    Task<Result> PerformActionAsync(IContext context, string playerName, int id);
+    Task<Result> PerformActionAsync(string playerId, int id);
+    Task<Result> ForcePerformActionAsync(string playerId);
 }

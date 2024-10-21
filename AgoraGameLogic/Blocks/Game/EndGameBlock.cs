@@ -9,7 +9,7 @@ using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks.Game;
 
-public class EndGameBlock : StatementBlockBase
+public class EndGameBlock : StatementBlock
 {
     private Value<EndGameMethod> _method;
     
@@ -18,14 +18,14 @@ public class EndGameBlock : StatementBlockBase
         _method = Value<EndGameMethod>.ParseOrThrow(buildData.Inputs[0], gameData);
     }
 
-    public override async Task<Result> ExecuteAsync(Scope scope)
+    public override async Task<Result> ExecuteAsync()
     {
         try
         {
             GameModule[] winners;
             object[] args;
 
-            var method = _method.GetValueOrThrow(scope.Context);
+            var method = _method.GetValueOrThrow(TurnScope.Context);
             switch (method)
             {
                 case EndGameMethod.LeastCardsInHand:

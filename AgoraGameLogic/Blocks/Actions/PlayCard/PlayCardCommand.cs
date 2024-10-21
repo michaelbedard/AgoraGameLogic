@@ -12,7 +12,7 @@ public class PlayCardCommand : ActionCommand<PlayCardCommand, PlayCardBlock, OnP
 {
     public GameModule Card { get; set; }
     
-    public PlayCardCommand(PlayCardBlock actionBlockStatementBlock, Scope? scope) : base(actionBlockStatementBlock, scope)
+    public PlayCardCommand(PlayCardBlock actionBlockStatementBlock, TurnScope? scope) : base(actionBlockStatementBlock, scope)
     {
     }
 

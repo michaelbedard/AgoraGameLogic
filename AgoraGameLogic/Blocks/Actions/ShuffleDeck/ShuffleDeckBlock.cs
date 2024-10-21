@@ -6,7 +6,7 @@ using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks.Actions.ShuffleDeck;
 
-public class ShuffleDeckBlock : ActionBlockBase<ShuffleDeckCommand, ShuffleDeckBlock, OnShuffleDeckBlock>
+public class ShuffleDeckBlock : ActionBlock<ShuffleDeckCommand, ShuffleDeckBlock, OnShuffleDeckBlock>
 {
     private Value<GameModule> _playerValue;
     private Value<GameModule> _deckValue;
@@ -18,14 +18,14 @@ public class ShuffleDeckBlock : ActionBlockBase<ShuffleDeckCommand, ShuffleDeckB
         _deckValue = Value<GameModule>.ParseOrThrow(buildData.Inputs[2], gameData);
     }
     
-    public override ShuffleDeckCommand GetCommandOrThrow(IContext context)
+    public override ShuffleDeckCommand GetCommandOrThrow()
     {
-        var player = _playerValue.GetValueOrThrow(context);
-        var deck = _deckValue.GetValueOrThrow(context);
+        var player = _playerValue.GetValueOrThrow(TurnScope.Context);
+        var deck = _deckValue.GetValueOrThrow(TurnScope.Context);
 
         var options = new Dictionary<string, object>();
 
-        return new ShuffleDeckCommand(this, Scope)
+        return new ShuffleDeckCommand(this, TurnScope)
         {
             Target = player,
             Deck = deck,

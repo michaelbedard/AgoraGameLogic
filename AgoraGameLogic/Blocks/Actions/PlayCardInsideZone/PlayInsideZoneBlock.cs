@@ -6,7 +6,7 @@ using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks.Actions.PlayCardInsideZone;
 
-public class PlayInsideZoneBlock : ActionBlockBase<PlayInsideZoneCommand, PlayInsideZoneBlock, OnPlayInsideZoneBlock>
+public class PlayInsideZoneBlock : ActionBlock<PlayInsideZoneCommand, PlayInsideZoneBlock, OnPlayInsideZoneBlock>
 {
     private Value<GameModule> _playerValue;
     private Value<GameModule> _cardValue;
@@ -20,15 +20,15 @@ public class PlayInsideZoneBlock : ActionBlockBase<PlayInsideZoneCommand, PlayIn
         _zoneValue = Value<GameModule>.ParseOrThrow(buildData.Inputs[3], gameData);
     }
 
-    public override PlayInsideZoneCommand GetCommandOrThrow(IContext context)
+    public override PlayInsideZoneCommand GetCommandOrThrow()
     {
-        var player = _playerValue.GetValueOrThrow(context);
-        var card = _cardValue.GetValueOrThrow(context);
-        var zone = _zoneValue.GetValueOrThrow(context);
+        var player = _playerValue.GetValueOrThrow(TurnScope.Context);
+        var card = _cardValue.GetValueOrThrow(TurnScope.Context);
+        var zone = _zoneValue.GetValueOrThrow(TurnScope.Context);
 
         var options = new Dictionary<string, object>();
 
-        return new PlayInsideZoneCommand(this, Scope)
+        return new PlayInsideZoneCommand(this, TurnScope)
         {
             Target = player,
             Card = card,

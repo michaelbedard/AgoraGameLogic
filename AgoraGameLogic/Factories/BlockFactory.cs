@@ -26,7 +26,7 @@ public class BlockFactory
     /// <summary>
     /// Attempts to create an array of blocks from BlockBuildData and returns a Result containing the array or an error message.
     /// </summary>
-    public static Result<T[]> CreateArray<T>(BlockBuildData[] blockBuildDataArray, GameData gameData) where T : BlockBase
+    public static Result<T[]> CreateArray<T>(BlockBuildData[] blockBuildDataArray, GameData gameData) where T : Block
     {
         try
         {
@@ -64,7 +64,7 @@ public class BlockFactory
     /// <summary>
     /// Attempts to create an array of blocks from a JArray and returns a Result containing the array or an error message.
     /// </summary>
-    public static Result<T[]> CreateArray<T>(JArray blockArray, GameData gameData) where T : BlockBase
+    public static Result<T[]> CreateArray<T>(JArray blockArray, GameData gameData) where T : Block
     {
         try
         {
@@ -108,7 +108,7 @@ public class BlockFactory
     /// <summary>
     /// Creates an array of blocks from a BlockBuildData[] and throws an exception if the operation fails.
     /// </summary>
-    public static T[] CreateArrayOrThrow<T>(BlockBuildData[] blockBuildDataArray, GameData gameData) where T : BlockBase
+    public static T[] CreateArrayOrThrow<T>(BlockBuildData[] blockBuildDataArray, GameData gameData) where T : Block
     {
         var createArrayResult = CreateArray<T>(blockBuildDataArray, gameData);
         if (!createArrayResult.IsSuccess)
@@ -122,7 +122,7 @@ public class BlockFactory
     /// <summary>
     /// Creates an array of blocks from a JArray and throws an exception if the operation fails.
     /// </summary>
-    public static T[] CreateArrayOrThrow<T>(JArray blockArray, GameData gameData) where T : BlockBase
+    public static T[] CreateArrayOrThrow<T>(JArray blockArray, GameData gameData) where T : Block
     {
         var createArrayResult = CreateArray<T>(blockArray, gameData);
         if (!createArrayResult.IsSuccess)
@@ -136,7 +136,7 @@ public class BlockFactory
     /// <summary>
     /// Attempts to create a block of the specified type from a JToken.
     /// </summary>
-    public static Result<T> Create<T>(JToken blockToken, GameData gameData) where T : BlockBase
+    public static Result<T> Create<T>(JToken blockToken, GameData gameData) where T : Block
     {
         var blockDefinitionResult = BlockBuildData.Parse(blockToken);
         if (!blockDefinitionResult.IsSuccess)
@@ -152,7 +152,7 @@ public class BlockFactory
     /// <summary>
     /// Attempts to create a block of the specified type from BlockBuildData.
     /// </summary>
-    public static Result<T> Create<T>(BlockBuildData blockBuildData, GameData gameData) where T : BlockBase
+    public static Result<T> Create<T>(BlockBuildData blockBuildData, GameData gameData) where T : Block
     {
         try
         {
@@ -182,7 +182,7 @@ public class BlockFactory
     /// <summary>
     /// Attempts to create a block of the specified type from a JToken.
     /// </summary>
-    public static T CreateOrThrow<T>(JToken blockToken, GameData gameData) where T : BlockBase
+    public static T CreateOrThrow<T>(JToken blockToken, GameData gameData) where T : Block
     {
         var blockResult = Create<T>(blockToken, gameData);
         if (!blockResult.IsSuccess)
@@ -196,11 +196,11 @@ public class BlockFactory
     /// <summary>
     /// Attempts to create a block from the provided BlockBuildData based on its type.
     /// </summary>
-    public static Result<BlockBase> Create(BlockBuildData blockBuildData, GameData gameData)
+    public static Result<Block> Create(BlockBuildData blockBuildData, GameData gameData)
     {
         try
         {
-            BlockBase? block;
+            Block? block;
             block = blockBuildData.Type switch
             {
                 // Dev
@@ -241,6 +241,7 @@ public class BlockFactory
                 // Turns
                 nameof(TurnByTurnBlock) => new TurnByTurnBlock(blockBuildData, gameData),
                 //nameof(AllTogetherBlock) => new AllTogetherBlock(blockDefinition, gameData),
+                nameof(EndTurnBlock) => new EndTurnBlock(blockBuildData, gameData),
 
                 // Values
                 nameof(ContextValueBlock) => new ContextValueBlock(blockBuildData, gameData),
@@ -254,14 +255,14 @@ public class BlockFactory
             
             if (block == null)
             {
-                return Result<BlockBase>.Failure($"Don't know how to create block of type '{blockBuildData.Type}'");
+                return Result<Block>.Failure($"Don't know how to create block of type '{blockBuildData.Type}'");
             }
 
-            return Result<BlockBase>.Success(block);
+            return Result<Block>.Success(block);
         }
         catch (Exception e)
         {
-            return Result<BlockBase>.Failure($"Exception occurred while creating block: {e.Message}");
+            return Result<Block>.Failure($"Exception occurred while creating block: {e.Message}");
         }
     }
 }

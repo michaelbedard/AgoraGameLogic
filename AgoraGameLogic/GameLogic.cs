@@ -88,8 +88,14 @@ public class GameLogic
     {
         _gameData.GameIsRunning = true;
         
+        // define scope
+        var scope = new TurnScope()
+        {
+            Context = _gameData.GlobalContext.Copy()
+        };
+        
         // perform action
-        var task = _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(_gameData.GlobalContext.Copy(), new StartGameCommand(), null);
+        var task = _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(scope, new StartGameCommand());
 
         task.ContinueWith(t =>
         {

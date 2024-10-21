@@ -6,8 +6,4 @@ namespace AgoraGameLogic.Services;
 
 public class AnimationService : CommandService<AnimationCommand>, IAnimationService
 {
-    protected override Result OnCommandFiltered()
-    {
-        return Result.Success();
-    }
 }

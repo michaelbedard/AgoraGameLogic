@@ -64,7 +64,7 @@ namespace AgoraGameLogic.Actors
         public string? ClassName { get; set; }
         public string? MethodName { get; set; }
         public GameModule? GameModule { get; set; }
-        public Scope? Scope { get; set; }
+        public TurnScope? Scope { get; set; }
         public string? Details { get; set; }
 
         public string GetErrorMessage(string error)

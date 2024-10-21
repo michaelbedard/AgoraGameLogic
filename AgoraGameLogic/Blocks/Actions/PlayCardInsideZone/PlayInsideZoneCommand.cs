@@ -13,7 +13,7 @@ public class PlayInsideZoneCommand : ActionCommand<PlayInsideZoneCommand, PlayIn
     public GameModule Card;
     public GameModule Zone;
     
-    public PlayInsideZoneCommand(PlayInsideZoneBlock actionBlockStatementBlock, Scope? scope) : base(actionBlockStatementBlock, scope)
+    public PlayInsideZoneCommand(PlayInsideZoneBlock actionBlockStatementBlock, TurnScope? scope) : base(actionBlockStatementBlock, scope)
     {
     }
 

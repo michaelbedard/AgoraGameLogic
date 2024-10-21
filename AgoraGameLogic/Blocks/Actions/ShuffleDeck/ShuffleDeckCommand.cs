@@ -12,7 +12,7 @@ public class ShuffleDeckCommand : ActionCommand<ShuffleDeckCommand, ShuffleDeckB
 {
     public GameModule Deck;
     
-    public ShuffleDeckCommand(ShuffleDeckBlock actionBlock, Scope? scope) : base(actionBlock, scope)
+    public ShuffleDeckCommand(ShuffleDeckBlock actionBlock, TurnScope? scope) : base(actionBlock, scope)
     {
     }
 

@@ -13,11 +13,11 @@ public class DrawCardCommand : ActionCommand<DrawCardCommand, DrawCardBlock, OnD
     public GameModule Deck;
     public GameModule TopCard;
     
-    public DrawCardCommand(DrawCardBlock actionBlock, Scope? scope) : base(actionBlock, scope)
+    public DrawCardCommand(DrawCardBlock actionBlock, TurnScope turnScope) : base(actionBlock, turnScope)
     {
     }
 
-    public override Result Perform(DrawCardCommand command, IContext context)
+    public override Result Perform()
     {
         try
         {
@@ -45,7 +45,7 @@ public class DrawCardCommand : ActionCommand<DrawCardCommand, DrawCardBlock, OnD
         }
     }
 
-    public override Result Revert(DrawCardCommand command, IContext context)
+    public override Result Revert()
     {
         throw new NotImplementedException();
     }
@@ -55,7 +55,7 @@ public class DrawCardCommand : ActionCommand<DrawCardCommand, DrawCardBlock, OnD
         return new List<GameModule>() { Deck, TopCard };
     }
 
-    public override CommandDto InitializeDto()
+    public override CommandDto GetDtoCore()
     {
         return new DrawCardActionDto()
         {

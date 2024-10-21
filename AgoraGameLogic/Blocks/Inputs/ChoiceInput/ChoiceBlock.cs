@@ -5,7 +5,7 @@ using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.Blocks.Inputs.ChoiceInput;
 
-public class ChoiceBlock : InputBlockBase<ChoiceCommand, ChoiceBlock, OnChoiceBlock>
+public class ChoiceBlock : InputBlock<ChoiceCommand, ChoiceBlock, OnChoiceBlock>
 {
     private Value<GameModule> _target;
     private Value<object[]> _choices;
@@ -16,19 +16,26 @@ public class ChoiceBlock : InputBlockBase<ChoiceCommand, ChoiceBlock, OnChoiceBl
         _choices = Value<object[]>.ParseOrThrow(buildData.Inputs[1], gameData);
     }
 
-    public override ChoiceCommand GetCommandOrThrow(IContext context)
+    protected override Result<ChoiceCommand> GetCommand()
     {
-        var target = _target.GetValueOrThrow(context);
-        var choices = _choices.GetValueOrThrow(context);
-        
-        var options = new Dictionary<string, object>();
-
-        return new ChoiceCommand(this, Scope)
+        try
         {
-            Target = target,
-            Choices = choices,
-            AnswerIndex = -1,
-            Options = options,
-        };
+            var target = _target.GetValueOrThrow(Context);
+            var choices = _choices.GetValueOrThrow(Context);
+
+            var options = new Dictionary<string, object>();
+
+            return Result<ChoiceCommand>.Success(new ChoiceCommand(this, Scope)
+            {
+                Target = target,
+                Choices = choices,
+                AnswerIndex = -1,
+                Options = options,
+            });
+        }
+        catch (Exception e)
+        {
+            return Result<ChoiceCommand>.Failure(e.Message);
+        }
     }
 }

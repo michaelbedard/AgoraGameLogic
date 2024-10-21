@@ -1,40 +1,42 @@
-using System;
-using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
-using AgoraGameLogic.Interfaces.Actors;
 using AgoraGameLogic.Utility.BuildData;
 using AgoraGameLogic.Utility.Commands;
 using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks;
 
-public abstract class ActionBlockBase : StatementBlockBase
+public abstract class ActionBlock : StatementBlock
 {
-    public ActionBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
+    public ActionBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
     }
 }
 
-public abstract class ActionBlockBase<TCommand, TBlock, TEvent> : ActionBlockBase
+public abstract class ActionBlock<TCommand, TBlock, TEvent> : ActionBlock
     where TCommand : ActionCommand<TCommand, TBlock, TEvent>
-    where TBlock : ActionBlockBase<TCommand, TBlock, TEvent>
-    where TEvent : EventBlockBase
+    where TBlock : ActionBlock<TCommand, TBlock, TEvent>
+    where TEvent : EventBlock
 {
     protected Value<ActionBehavior> BehaviorValue;
-    protected ActionBlockBase(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
+    protected ActionBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
         BehaviorValue = Value<ActionBehavior>.ParseOrThrow(buildData.Inputs[0], gameData); // always in 1st place
     }
 
-    public abstract TCommand GetCommandOrThrow(IContext context);
+    protected abstract Result<TCommand> GetCommand();
     
-    public override async Task<Result> ExecuteAsync(Scope scope)
+    protected override async Task<Result> ExecuteAsyncCore()
     {
         try
         {
-            var behavior= BehaviorValue.GetValueOrThrow(scope.Context);
-            var command = GetCommandOrThrow(scope.Context);
-        
+            var behavior= BehaviorValue.GetValueOrThrow(Context);
+            var commandResult = GetCommand();
+            if (!commandResult.IsSuccess)
+            {
+                return Result.Failure(commandResult.Error);
+            }
+
+            var command = commandResult.Value;
             switch (behavior)
             {
                 case ActionBehavior.Allow:
@@ -49,7 +51,7 @@ public abstract class ActionBlockBase<TCommand, TBlock, TEvent> : ActionBlockBas
                 }
                 case ActionBehavior.Perform:
                 {
-                    await command.PerformAsync(scope.Context, false);
+                    await command.PerformAsync(false);
                     break;
                 }
             }

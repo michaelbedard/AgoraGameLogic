@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Dtos;
-
+using AgoraGameLogic.Utility.Enums;
 namespace AgoraGameLogic.Utility.Commands;
 
 public abstract class Command : IEquatable<Command>
@@ -11,7 +9,10 @@ public abstract class Command : IEquatable<Command>
     public Type Type;
     public GameModule Target;
     public Dictionary<string, object> Options;
-    public Scope? Scope;
+    public TurnScope? Scope;
+    public bool IsPriority;
+    public bool IsCancelable;
+    
     
     public abstract bool Equals(Command command);
     public abstract List<GameModule> GetArgs();

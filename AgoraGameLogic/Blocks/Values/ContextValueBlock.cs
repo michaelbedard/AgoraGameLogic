@@ -5,7 +5,7 @@ using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.Blocks.Values;
 
-public class ContextValueBlock : ValueBlockBase
+public class ContextValueBlock : ValueBlock
 {
     private Value<string> _bindingName;
     private Value<string[]>? _fields;
@@ -21,17 +21,17 @@ public class ContextValueBlock : ValueBlockBase
         }
     }
     
-    public override Result<T> GetValue<T>(IContext context)
+    protected override Result<T> GetValue<T>()
     {
         try
         {
-            var key = _bindingName.GetValueOrThrow(context);
-            var result = context.Get<object>(key);
+            var key = _bindingName.GetValueOrThrow(Context);
+            var result = Context.Get<object>(key);
             if (_fields != null)
             {
                 if (result is GameModule gameModule)
                 {
-                    foreach (var field in _fields.GetValueOrThrow(context))
+                    foreach (var field in _fields.GetValueOrThrow(Context))
                     {
                         result = gameModule.Fields.Get<object>(field);
                     }

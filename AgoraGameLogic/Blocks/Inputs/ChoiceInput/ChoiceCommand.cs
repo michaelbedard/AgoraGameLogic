@@ -1,30 +1,27 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks.Options.InputOptions;
 using AgoraGameLogic.Dtos;
 using AgoraGameLogic.Dtos.InputCommandDtos;
-using AgoraGameLogic.Interfaces.Actors;
 using AgoraGameLogic.Utility.Commands;
+using AgoraGameLogic.Utility.Extensions;
 
 namespace AgoraGameLogic.Blocks.Inputs.ChoiceInput;
 
 public class ChoiceCommand : InputCommand<ChoiceCommand, ChoiceBlock, OnChoiceBlock>
 {
-    public object[] Choices;
-    public int AnswerIndex;
+    public object[] Choices { get; set; }
+    public int AnswerIndex { get; set; }
     
-    public ChoiceCommand(ChoiceBlock inputBlock, Scope? scope) : base(inputBlock, scope)
+    public ChoiceCommand(ChoiceBlock inputBlock, TurnScope scope) : base(inputBlock, scope)
     {
     }
 
-    public override async Task<Result> PerformAsync(ChoiceCommand command, IContext context, object? answer)
+    public override Result Resolve(object? answer)
     {
         try
         {
-            context.AddOrUpdate("Answer", ref answer);
-
+            InputBlock.Context.AddOrUpdate("Answer", ref answer);
+            
             // AddToHandOption
             if (answer != null && InputBlock.HasOption<AddToHandOption>())
             {
@@ -40,12 +37,17 @@ public class ChoiceCommand : InputCommand<ChoiceCommand, ChoiceBlock, OnChoiceBl
         }
     }
 
-    public override Result Revert(ChoiceCommand command, IContext context)
+    public override object GetDefaultAnswer()
+    {
+        return Choices.ToList().GetRandom();
+    }
+    
+    public override Result Revert()
     {
         throw new NotImplementedException();
     }
 
-    public override CommandDto InitializeDto()
+    public override CommandDto GetDtoCore()
     {
         return new ChoiceInputDto()
         {

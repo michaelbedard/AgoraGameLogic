@@ -7,19 +7,19 @@ using AgoraGameLogic.Utility.Extensions;
 
 namespace AgoraGameLogic.Blocks.Actions.DrawCard;
 
-public class OnDrawCardBlock : EventBlockBase<DrawCardCommand>
+public class OnDrawCardBlock : EventBlock<DrawCardCommand>
 {
     public OnDrawCardBlock(BlockBuildData buildData, GameData gameData) : base (buildData, gameData)
     {
-        Blocks = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[0].AsValidArray(), gameData);
+        Blocks = BlockFactory.CreateArrayOrThrow<StatementBlock>(buildData.Inputs[0].AsValidArray(), gameData);
     }
 
-    protected override async Task<Result> TriggerAsync(Scope scope, DrawCardCommand command)
+    protected override async Task<Result> TriggerAsyncCore(DrawCardCommand command)
     {
-        scope.Context.AddOrUpdate("Player", command.Target);
-        scope.Context.AddOrUpdate("Deck", command.Deck);
-        scope.Context.AddOrUpdate("Card", command.TopCard);
+        Context.AddOrUpdate("Player", command.Target);
+        Context.AddOrUpdate("Deck", command.Deck);
+        Context.AddOrUpdate("Card", command.TopCard);
 
-        return await ExecuteSequenceAsync(Blocks, scope);
+        return await ExecuteSequenceAsync(Blocks);
     }
 }

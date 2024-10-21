@@ -6,7 +6,7 @@ using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.Blocks.Controls;
 
-public class SetValueBlock : StatementBlockBase
+public class SetValueBlock : StatementBlock
 {
     private Value<string> _key;
     private Value<object> _value;
@@ -17,14 +17,14 @@ public class SetValueBlock : StatementBlockBase
         _value = Value<object>.ParseOrThrow(buildData.Inputs[1], gameData);
     }
     
-    public override async Task<Result> ExecuteAsync(Scope scope)
+    public override async Task<Result> ExecuteAsync()
     {
         try
         {
-            var key = _key.GetValueOrThrow(scope.Context);
-            var value = _value.GetValueOrThrow(scope.Context);
+            var key = _key.GetValueOrThrow(TurnScope.Context);
+            var value = _value.GetValueOrThrow(TurnScope.Context);
 
-            scope.Context.AddOrUpdate(key, ref value);
+            TurnScope.Context.AddOrUpdate(key, ref value);
             return Result.Success();
         }
         catch (Exception e)

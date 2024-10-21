@@ -6,7 +6,7 @@ using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks.Actions.PlayCard;
 
-public class PlayCardBlock : ActionBlockBase<PlayCardCommand, PlayCardBlock, OnPlayCardBlock>
+public class PlayCardBlock : ActionBlock<PlayCardCommand, PlayCardBlock, OnPlayCardBlock>
 {
     private Value<GameModule> _target;
     private Value<GameModule> _card;
@@ -18,14 +18,14 @@ public class PlayCardBlock : ActionBlockBase<PlayCardCommand, PlayCardBlock, OnP
         _card = Value<GameModule>.ParseOrThrow(buildData.Inputs[2], gameData);
     }
     
-    public override PlayCardCommand GetCommandOrThrow(IContext context)
+    public override PlayCardCommand GetCommandOrThrow()
     {
-        var target = _target.GetValueOrThrow(context);
-        var card = _card.GetValueOrThrow(context);
+        var target = _target.GetValueOrThrow(TurnScope.Context);
+        var card = _card.GetValueOrThrow(TurnScope.Context);
 
         var options = new Dictionary<string, object>();
 
-        return new PlayCardCommand(this, Scope)
+        return new PlayCardCommand(this, TurnScope)
         {
             Target = target,
             Card = card,

@@ -8,12 +8,12 @@ namespace AgoraGameLogic.Actors;
 
 public class Value<T>
 {
-    private readonly ValueBlockBase? _blockInput;
+    private readonly ValueBlock? _blockInput;
     private readonly T? _userInput;
     
     private readonly bool _isUserInput;
 
-    private Value(ValueBlockBase blockAsInput)
+    private Value(ValueBlock blockAsInput)
     {
         _isUserInput = false;
         _blockInput = blockAsInput;
@@ -71,7 +71,7 @@ public class Value<T>
         // Case 1: If the token is a block (it's an object with a "Type" field)
         if (valueToken.Type == JTokenType.Object && valueToken["Type"] != null)
         {
-            var valueBlockResult = BlockFactory.Create<ValueBlockBase>(valueToken, gameData);
+            var valueBlockResult = BlockFactory.Create<ValueBlock>(valueToken, gameData);
             if (!valueBlockResult.IsSuccess)
             {
                 throw new Exception($"Cannot parse block {valueToken["Type"]}: {valueBlockResult.Error}");

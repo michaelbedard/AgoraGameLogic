@@ -6,5 +6,5 @@ namespace AgoraGameLogic.Services;
 
 public class ExecutionService : IExecutionService
 {
-    private List<StatementBlockBase> _executionList;
+    private List<StatementBlock> _executionList;
 }

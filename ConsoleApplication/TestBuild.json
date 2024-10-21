@@ -15,7 +15,7 @@
       "Name" : "PlayingCardStructure",
       "Extension" : "BaseStructure",
       "Fields" : [
-        {"Key" : "Color", "Value" : "green"},
+        {"Key" : "Color", "Value" : "green"}, //fesygfi8e
         {"Key" : "Number", "Value" : 0}
       ],
       "Blocks" : [
@@ -25,9 +25,23 @@
 //            {"Type": "LogBlock", "Inputs": ["this is log from the PlayingCardStructure!"]}
 //          ]
 //        ]},
-        {"Type": "OnDrawCardBlock", "Options": [], "Inputs": [
+        {"Type": "OnDrawCardBlock", "Options": [
+          {"Type" : "OnlyTriggerIfTargetedBlock", "Inputs" : []}
+        ], "Inputs": [
           [
-            {"Type": "LogBlock", "Inputs": ["Trigger from OnDrawCardBlock by card!!!"]}
+            {"Type": "LogBlock", "Inputs": ["This cardhas been draw!!!"]},
+            {"Type": "PlayCardBlock", "Inputs": ["Allow",             
+              {"Type" : "ContextValueBlock", "Inputs" : ["Player"]},
+              {"Type" : "ContextValueBlock", "Inputs" : ["Card"]}
+            ]},
+          ]
+        ]},
+        {"Type": "OnPlayCardBlock", "Options": [
+          {"Type" : "OnlyTriggerIfTargetedBlock", "Inputs" : []}
+        ], "Inputs": [
+          [
+            {"Type": "LogBlock", "Inputs": ["This cardhas been played!!!  end turn"]},
+            {"Type": "EndTurnBlock", "Inputs": []},
           ]
         ]}
       ]

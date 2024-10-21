@@ -7,15 +7,15 @@ using AgoraGameLogic.Utility.Extensions;
 
 namespace AgoraGameLogic.Blocks.Game.StartGame;
 
-public class OnStartGameBlock : EventBlockBase<StartGameCommand>
+public class OnStartGameBlock : EventBlock<StartGameCommand>
 {
     public OnStartGameBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        Blocks = BlockFactory.CreateArrayOrThrow<StatementBlockBase>(buildData.Inputs[0].AsValidArray(), gameData);
+        Blocks = BlockFactory.CreateArrayOrThrow<StatementBlock>(buildData.Inputs[0].AsValidArray(), gameData);
     }
 
-    protected override async Task<Result> TriggerAsync(Scope scope, StartGameCommand command)
+    protected override async Task<Result> TriggerAsync(TurnScope turnScope, StartGameCommand command)
     {
-        return await ExecuteSequenceAsync(Blocks, scope);
+        return await ExecuteSequenceAsync(Blocks, turnScope);
     }
 }
