@@ -16,13 +16,13 @@ public class PlayCardCommand : ActionCommand<PlayCardCommand, PlayCardBlock, OnP
     {
     }
 
-    public override Result Perform(PlayCardCommand command, IContext context)
+    public override Result Perform()
     {
         try
         {
             // logic
-            var cardsInHand = command.Target.Fields.Get<List<GameModule>>("Hand");
-            cardsInHand.Remove(command.Card);
+            var cardsInHand = Target.Fields.Get<List<GameModule>>("Hand");
+            cardsInHand.Remove(Card);
 
             return Result.Success();
 
@@ -35,13 +35,13 @@ public class PlayCardCommand : ActionCommand<PlayCardCommand, PlayCardBlock, OnP
         }
     }
 
-    public override Result Revert(PlayCardCommand command, IContext context)
+    public override Result Revert()
     {
         try
         {
             // logic
-            var cardsInHand = command.Target.Fields.Get<List<GameModule>>("Hand");
-            cardsInHand.Add(command.Card);
+            var cardsInHand = Target.Fields.Get<List<GameModule>>("Hand");
+            cardsInHand.Add(Card);
         
             // animation
             // ActionBlock.PushAnimation(new PlayCardAnimationDto(GetType().ToString(), args, new Dictionary<string, object>()
@@ -64,7 +64,7 @@ public class PlayCardCommand : ActionCommand<PlayCardCommand, PlayCardBlock, OnP
         return new List<GameModule>() { Target, Card };
     }
 
-    public override CommandDto InitializeDto()
+    public override CommandDto GetDtoCore()
     {
         return new PlayCardActionDto()
         {

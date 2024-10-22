@@ -14,12 +14,12 @@ public class OnPlayInsideZoneBlock : EventBlock<PlayInsideZoneCommand>
         Blocks = BlockFactory.CreateArrayOrThrow<StatementBlock>(buildData.Inputs[0].AsValidArray(), gameData);
     }
 
-    protected override async Task<Result> TriggerAsync(TurnScope turnScope, PlayInsideZoneCommand command)
+    protected override async Task<Result> TriggerAsyncCore(PlayInsideZoneCommand command)
     {
-        turnScope.Context.AddOrUpdate("Player", ref command.Target);
-        turnScope.Context.AddOrUpdate("Card", ref command.Card);
-        turnScope.Context.AddOrUpdate("Zone", ref command.Zone);
+        Context.AddOrUpdate("Player", ref command.Target);
+        Context.AddOrUpdate("Card", ref command.Card);
+        Context.AddOrUpdate("Zone", ref command.Zone);
 
-        return await ExecuteSequenceAsync(Blocks, turnScope);
+        return await ExecuteSequenceAsync(Blocks);
     }
 }

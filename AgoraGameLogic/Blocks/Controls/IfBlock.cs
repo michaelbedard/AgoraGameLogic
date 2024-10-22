@@ -19,13 +19,13 @@ public class IfBlock : StatementBlock
         _trueBranch = BlockFactory.CreateArrayOrThrow<StatementBlock>(buildData.Inputs[1].AsValidArray(), gameData);
     }
 
-    public override async Task<Result> ExecuteAsync()
+    protected override async Task<Result> ExecuteAsyncCore()
     {
         try
         {
-            if (_condition.IsSatisfiedOrThrow(TurnScope.Context))
+            if (_condition.IsSatisfiedOrThrow(Context))
             {
-                return await ExecuteSequenceAsync(_trueBranch, TurnScope); // this return a result
+                return await ExecuteSequenceAsync(_trueBranch); // this return a result
             }
 
             return Result.Success();

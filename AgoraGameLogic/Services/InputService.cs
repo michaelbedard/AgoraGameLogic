@@ -34,7 +34,7 @@ public class InputService : CommandService<InputCommand>, IInputService
 
     public bool HasUnresolvedInputs(GameModule player)
     {
-        var store = CommandStoresByPlayerName[player.Id].GetAllCommands();
+        var store = CommandStoresByPlayerId[player.Id].GetAllCommands();
         if (!store.IsSuccess)
         {
             throw new Exception($"cannot get all commands for {player.Id}");
@@ -45,7 +45,7 @@ public class InputService : CommandService<InputCommand>, IInputService
 
     public async Task<Result> ResolveNextInput(GameModule player)
     {
-        var store = CommandStoresByPlayerName[player.Id].GetAllCommands();
+        var store = CommandStoresByPlayerId[player.Id].GetAllCommands();
         if (!store.IsSuccess)
         {
             throw new Exception($"cannot get all commands for {player.Id}");

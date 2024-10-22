@@ -20,20 +20,20 @@ public class PlayInsideZoneBlock : ActionBlock<PlayInsideZoneCommand, PlayInside
         _zoneValue = Value<GameModule>.ParseOrThrow(buildData.Inputs[3], gameData);
     }
 
-    public override PlayInsideZoneCommand GetCommandOrThrow()
+    protected override Result<PlayInsideZoneCommand> GetCommand()
     {
-        var player = _playerValue.GetValueOrThrow(TurnScope.Context);
-        var card = _cardValue.GetValueOrThrow(TurnScope.Context);
-        var zone = _zoneValue.GetValueOrThrow(TurnScope.Context);
+        var player = _playerValue.GetValueOrThrow(Context);
+        var card = _cardValue.GetValueOrThrow(Context);
+        var zone = _zoneValue.GetValueOrThrow(Context);
 
         var options = new Dictionary<string, object>();
 
-        return new PlayInsideZoneCommand(this, TurnScope)
+        return Result<PlayInsideZoneCommand>.Success(new PlayInsideZoneCommand(this, Scope)
         {
             Target = player,
             Card = card,
             Zone = zone,
             Options = options
-        };
+        });
     }
 }

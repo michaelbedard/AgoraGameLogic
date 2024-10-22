@@ -67,7 +67,7 @@ public class EventService : IEventService
     /// <summary>
     /// Triggers events asynchronously and returns a Result.
     /// </summary>
-    public async Task<Result> TriggerEventsAsync<T>(TurnScope scope, Command command) where T : EventBlock
+    public async Task<Result> TriggerEventsAsync<T>(TurnScope? scope, Command command) where T : EventBlock
     {
         try
         {

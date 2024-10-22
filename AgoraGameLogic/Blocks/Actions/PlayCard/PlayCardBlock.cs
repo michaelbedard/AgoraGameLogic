@@ -18,18 +18,18 @@ public class PlayCardBlock : ActionBlock<PlayCardCommand, PlayCardBlock, OnPlayC
         _card = Value<GameModule>.ParseOrThrow(buildData.Inputs[2], gameData);
     }
     
-    public override PlayCardCommand GetCommandOrThrow()
+    protected override Result<PlayCardCommand> GetCommand()
     {
-        var target = _target.GetValueOrThrow(TurnScope.Context);
-        var card = _card.GetValueOrThrow(TurnScope.Context);
+        var target = _target.GetValueOrThrow(Context);
+        var card = _card.GetValueOrThrow(Context);
 
         var options = new Dictionary<string, object>();
 
-        return new PlayCardCommand(this, TurnScope)
+        return Result<PlayCardCommand>.Success(new PlayCardCommand(this, Scope)
         {
             Target = target,
             Card = card,
             Options = options
-        };
+        });
     }
 }

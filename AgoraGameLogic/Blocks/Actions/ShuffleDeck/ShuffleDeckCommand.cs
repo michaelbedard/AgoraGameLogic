@@ -16,7 +16,7 @@ public class ShuffleDeckCommand : ActionCommand<ShuffleDeckCommand, ShuffleDeckB
     {
     }
 
-    public override Result Perform(ShuffleDeckCommand command, IContext context)
+    public override Result Perform()
     {
         try
         {
@@ -31,12 +31,12 @@ public class ShuffleDeckCommand : ActionCommand<ShuffleDeckCommand, ShuffleDeckB
         }
     }
 
-    public override Result Revert(ShuffleDeckCommand command, IContext context)
+    public override Result Revert()
     {
         throw new NotImplementedException();
     }
 
-    public override CommandDto InitializeDto()
+    public override CommandDto GetDtoCore()
     {
         throw new NotImplementedException();
     }

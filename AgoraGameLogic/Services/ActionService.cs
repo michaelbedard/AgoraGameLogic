@@ -38,7 +38,7 @@ public class ActionService : CommandService<ActionCommand>, IActionService
 
     public async Task<Result> ForcePerformActionAsync(string playerId)
     {
-        var store = CommandStoresByPlayerName[playerId].GetAllCommands();
+        var store = CommandStoresByPlayerId[playerId].GetAllCommands();
         if (!store.IsSuccess)
         {
             return Result.Failure($"cannot get all commands for {playerId}");

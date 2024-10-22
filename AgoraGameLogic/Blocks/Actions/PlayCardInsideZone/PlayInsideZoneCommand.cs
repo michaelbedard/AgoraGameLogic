@@ -17,7 +17,7 @@ public class PlayInsideZoneCommand : ActionCommand<PlayInsideZoneCommand, PlayIn
     {
     }
 
-    public override Result Perform(PlayInsideZoneCommand command, IContext context)
+    public override Result Perform()
     {
         try
         {
@@ -42,12 +42,12 @@ public class PlayInsideZoneCommand : ActionCommand<PlayInsideZoneCommand, PlayIn
         }
     }
 
-    public override Result Revert(PlayInsideZoneCommand command, IContext context)
+    public override Result Revert()
     {
         throw new NotImplementedException();
     }
 
-    public override CommandDto InitializeDto()
+    public override CommandDto GetDtoCore()
     {
         return new PlayCardInsideZoneActionDto()
         {

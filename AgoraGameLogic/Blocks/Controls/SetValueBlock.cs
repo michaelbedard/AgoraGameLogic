@@ -17,14 +17,14 @@ public class SetValueBlock : StatementBlock
         _value = Value<object>.ParseOrThrow(buildData.Inputs[1], gameData);
     }
     
-    public override async Task<Result> ExecuteAsync()
+    protected override async Task<Result> ExecuteAsyncCore()
     {
         try
         {
-            var key = _key.GetValueOrThrow(TurnScope.Context);
-            var value = _value.GetValueOrThrow(TurnScope.Context);
+            var key = _key.GetValueOrThrow(Context);
+            var value = _value.GetValueOrThrow(Context);
 
-            TurnScope.Context.AddOrUpdate(key, ref value);
+            Context.AddOrUpdate(key, ref value);
             return Result.Success();
         }
         catch (Exception e)

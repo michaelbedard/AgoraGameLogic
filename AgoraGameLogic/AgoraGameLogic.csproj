@@ -7,7 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Blocks\Customs\" />
       <Folder Include="Blocks\Options\Controls\" />
       <Folder Include="Blocks\Options\Dev\" />
       <Folder Include="Blocks\Options\Game\" />

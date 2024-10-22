@@ -18,18 +18,18 @@ public class ShuffleDeckBlock : ActionBlock<ShuffleDeckCommand, ShuffleDeckBlock
         _deckValue = Value<GameModule>.ParseOrThrow(buildData.Inputs[2], gameData);
     }
     
-    public override ShuffleDeckCommand GetCommandOrThrow()
+    protected override Result<ShuffleDeckCommand> GetCommand()
     {
-        var player = _playerValue.GetValueOrThrow(TurnScope.Context);
-        var deck = _deckValue.GetValueOrThrow(TurnScope.Context);
+        var player = _playerValue.GetValueOrThrow(Context);
+        var deck = _deckValue.GetValueOrThrow(Context);
 
         var options = new Dictionary<string, object>();
 
-        return new ShuffleDeckCommand(this, TurnScope)
+        return Result<ShuffleDeckCommand>.Success(new ShuffleDeckCommand(this, Scope)
         {
             Target = player,
             Deck = deck,
             Options = options
-        };
+        });
     }
 }

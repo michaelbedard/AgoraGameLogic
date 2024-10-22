@@ -23,21 +23,21 @@ public class ForeachBlock : StatementBlock
         _loopBranch = BlockFactory.CreateArrayOrThrow<StatementBlock>(buildData.Inputs[2].AsValidArray(), gameData);
     }
 
-    public override async Task<Result> ExecuteAsync()
+    protected override async Task<Result> ExecuteAsyncCore()
     {
         try
         {
-            var key = _key.GetValueOrThrow(TurnScope.Context);
-            var enumerable = _enumerable.GetValueOrThrow(TurnScope.Context).ToList();
+            var key = _key.GetValueOrThrow(Context);
+            var enumerable = _enumerable.GetValueOrThrow(Context).ToList();
 
             for (var i = 0; i < enumerable.Count(); i++)
             {
-                var contextCopy = TurnScope.Context.Copy();
+                var contextCopy = Context.Copy();
                 var item = enumerable[i];
 
                 contextCopy.AddOrUpdate(key, ref item);
 
-                await ExecuteSequenceOrThrowAsync(_loopBranch, TurnScope);
+                await ExecuteSequenceOrThrowAsync(_loopBranch);
             }
             
             return Result.Success();
@@ -46,7 +46,7 @@ public class ForeachBlock : StatementBlock
         {
             return Result.Failure(e.Message, new ErrorBuilder()
             {
-                Scope = TurnScope
+                Scope = Scope
             });
         }
     }

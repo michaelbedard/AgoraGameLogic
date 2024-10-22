@@ -11,7 +11,7 @@ public class GameData
     public Action<StateChangeDto> OnGameStateChange = delegate { };
     public Action<EndGameDto> OnEndGame = delegate { };
     
-    public EventService EventService = new EventService();
+    public IEventService EventService = new EventService();
     public IActionService ActionService = new ActionService();
     public IInputService InputService = new InputService();
     public ExecutionService ExecutionService = new ExecutionService();

@@ -12,7 +12,7 @@ public class OnShuffleDeckBlock : EventBlock<ShuffleDeckCommand>
     {
     }
 
-    protected override async Task<Result> TriggerAsync(TurnScope context, ShuffleDeckCommand command)
+    protected override async Task<Result> TriggerAsyncCore(ShuffleDeckCommand command)
     {
         throw new NotImplementedException();
     }

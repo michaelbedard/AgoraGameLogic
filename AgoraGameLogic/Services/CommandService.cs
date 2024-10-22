@@ -12,7 +12,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
 {
     protected IContext GlobalContext;
     
-    protected Dictionary<string, ICommandStore<TCommand>> CommandStoresByPlayerName = new Dictionary<string, ICommandStore<TCommand>>();
+    protected Dictionary<string, ICommandStore<TCommand>> CommandStoresByPlayerId = new Dictionary<string, ICommandStore<TCommand>>();
     private int _counter = 0;
 
     public void SetGlobalContext(IContext context)
@@ -26,7 +26,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
         {
             // set id and register command
             item.Id = _counter++;
-            var store = CommandStoresByPlayerName[player.Id];
+            var store = CommandStoresByPlayerId[player.Id];
             var registerResult = store.RegisterCommand(item);
 
             return registerResult;
@@ -43,7 +43,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
     
     public Result PullCommand(TCommand item, GameModule player)
     {
-        if (!CommandStoresByPlayerName.ContainsKey(player.Id))
+        if (!CommandStoresByPlayerId.ContainsKey(player.Id))
         {
             return Result.Failure($"No command store found for player {player.Id}", new ErrorBuilder()
             {
@@ -52,7 +52,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
             });
         }
         
-        var store = CommandStoresByPlayerName[player.Id];
+        var store = CommandStoresByPlayerId[player.Id];
         var commandsToRemove = new List<TCommand>();
 
         // get all commands for this player
@@ -87,7 +87,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
     public Result RemoveCommand(int commandId)
     {
         // iterate over each store
-        foreach (var store in CommandStoresByPlayerName.Values)
+        foreach (var store in CommandStoresByPlayerId.Values)
         {
             // get contains result
             var containsResult = store.ContainsCommand(commandId);
@@ -114,7 +114,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
     public Result<TCommand> GetCommand(string playerId, int commandId)
     {
         // get store for player
-        if (!CommandStoresByPlayerName.ContainsKey(playerId))
+        if (!CommandStoresByPlayerId.ContainsKey(playerId))
         {
             return Result<TCommand>.Failure($"Cannot get command {commandId} as player {playerId} has no command store yet", new ErrorBuilder()
             {
@@ -123,7 +123,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
             });
         }
         
-        return CommandStoresByPlayerName[playerId].GetCommand(commandId);
+        return CommandStoresByPlayerId[playerId].GetCommand(commandId);
     }
 
     
@@ -131,29 +131,53 @@ public abstract class CommandService<TCommand> where TCommand : Command
     {
         try
         {
-            // iterate over each store
-            foreach (var store in CommandStoresByPlayerName.Values)
+            var playerStore = CommandStoresByPlayerId[scope.Player.Id];
+            var allPlayerCommandsResult = playerStore.GetAllCommands();
+            if (!allPlayerCommandsResult.IsSuccess)
             {
-                // get all commands result
-                var allCommandsResult = store.GetAllCommands();
-                if (!allCommandsResult.IsSuccess)
-                {
-                    return Result.Failure(allCommandsResult.Error);
-                }
+                return Result.Failure(allPlayerCommandsResult.Error);
+            }
+            
+            foreach (var command in allPlayerCommandsResult.Value)
+            {
+                var commandScope = command.Scope;
+                if (commandScope == null) 
+                    continue;
                 
-                // for each command, remove command if scope is similar
-                foreach (var command in allCommandsResult.Value)
+                if (scope.Equals(commandScope))
                 {
-                    if (scope.Equals(command.Scope))
+                    var removeResult = playerStore.RemoveCommand(command);
+                    if (!removeResult.IsSuccess)
                     {
-                        var removeResult = store.RemoveCommand(command);
-                        if (!removeResult.IsSuccess)
-                        {
-                            return Result.Failure(removeResult.Error);
-                        }
+                        return Result.Failure(removeResult.Error);
                     }
                 }
             }
+            
+            //
+            // // iterate over each store
+            // foreach (var store in CommandStoresByPlayerId.Values)
+            // {
+            //     // get all commands result
+            //     var allCommandsResult = store.GetAllCommands();
+            //     if (!allCommandsResult.IsSuccess)
+            //     {
+            //         return Result.Failure(allCommandsResult.Error);
+            //     }
+            //     
+            //     // for each command, remove command if scope is similar
+            //     foreach (var command in allCommandsResult.Value)
+            //     {
+            //         if (scope.Equals(command.Scope))
+            //         {
+            //             var removeResult = store.RemoveCommand(command);
+            //             if (!removeResult.IsSuccess)
+            //             {
+            //                 return Result.Failure(removeResult.Error);
+            //             }
+            //         }
+            //     }
+            // }
 
             return Result.Success();
         }
@@ -172,7 +196,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
         try
         {
             var resultDictionary = new Dictionary<string, CommandDto[]>();
-            foreach (var commandStoreByPlayer in CommandStoresByPlayerName)
+            foreach (var commandStoreByPlayer in CommandStoresByPlayerId)
             {
                 var allCommandsResult = commandStoreByPlayer.Value.GetAllCommands();
                 if (!allCommandsResult.IsSuccess)
@@ -207,7 +231,7 @@ public abstract class CommandService<TCommand> where TCommand : Command
         {
             foreach (var player in players)
             {
-                CommandStoresByPlayerName[player.Id] = new CommandStore<TCommand>();
+                CommandStoresByPlayerId[player.Id] = new CommandStore<TCommand>();
             }
 
             return Result.Success();

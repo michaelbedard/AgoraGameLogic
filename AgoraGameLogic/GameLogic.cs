@@ -1,12 +1,9 @@
-﻿using System;
-using System.Linq;
-using AgoraGameLogic.Actors;
+﻿using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks.Game.StartGame;
 using AgoraGameLogic.Dtos;
 using AgoraGameLogic.Utility.BuildData;
 using AgoraGameLogic.Utility.Enums;
 using AgoraGameLogic.Utility.Extensions;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AgoraGameLogic;
@@ -69,6 +66,12 @@ public class GameLogic
             throw new Exception($"[Error loading game] {loadResult.Error}");
         }
         
+        // setup context inside services
+        _gameData.EventService.SetGlobalContext(_gameData.GlobalContext);
+        _gameData.ActionService.SetGlobalContext(_gameData.GlobalContext);
+        _gameData.InputService.SetGlobalContext(_gameData.GlobalContext);
+        _gameData.AnimationService.SetGlobalContext(_gameData.GlobalContext);
+        
         // initialize services
         var initializeResult = _gameData.InputService.InitializeDictionaryEntries(_gameData.Players)
             .Then(() => _gameData.ActionService.InitializeDictionaryEntries(_gameData.Players))
@@ -88,14 +91,8 @@ public class GameLogic
     {
         _gameData.GameIsRunning = true;
         
-        // define scope
-        var scope = new TurnScope()
-        {
-            Context = _gameData.GlobalContext.Copy()
-        };
-        
         // perform action
-        var task = _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(scope, new StartGameCommand());
+        var task = _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(null, new StartGameCommand());
 
         task.ContinueWith(t =>
         {
@@ -115,12 +112,11 @@ public class GameLogic
         if (string.IsNullOrEmpty(playerId))
         {
             Console.WriteLine($"[Action failed] PlayerId canot be null or empty");
-            InvokeOnGameStateChange();
             return;
         }
         
         // perform action
-        var task = _gameData.ActionService.PerformActionAsync(_gameData.GlobalContext.Copy(), playerId, actionCommandId);
+        var task = _gameData.ActionService.PerformActionAsync(playerId, actionCommandId);
 
         task.ContinueWith(t =>
         {
