@@ -13,7 +13,7 @@ public class BlockBuildData
     public BlockBuildData[] Options { get; set; }
     public JArray Inputs { get; set; }
 
-/// <summary>
+    /// <summary>
     /// Parses a JArray into an array of BlockBuildData objects by extracting and validating 
     /// each JToken in the array.
     /// </summary>
