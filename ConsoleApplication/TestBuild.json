@@ -127,7 +127,7 @@
         ], "Inputs" : [
           [
             // start branch
-            {"Type": "LogBlock", "Inputs": ["START"]},
+            {"Type": "LogBlock", "Inputs": ["START for ", {"Type": "ContextValueBlock", "Inputs" : ["player", ["Id"]]}]},
             {"Type": "DrawCardBlock", "Inputs": ["Allow",
               {"Type": "ContextValueBlock", "Inputs" : ["player"]}, // current player
               {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
@@ -143,11 +143,11 @@
           ], 
           [
             // update branch
-            {"Type": "LogBlock", "Inputs": ["UPDATE"]}
+            {"Type": "LogBlock", "Inputs": ["UPDATE for ", {"Type": "ContextValueBlock", "Inputs" : ["player", ["Id"]]}]}
           ], 
           [
             // end branch
-            {"Type": "LogBlock", "Inputs": ["END"]}
+            {"Type": "LogBlock", "Inputs": ["END for ", {"Type": "ContextValueBlock", "Inputs" : ["player", ["Id"]]}]}
           ]
         ]}
       ]

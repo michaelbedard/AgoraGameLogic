@@ -11,7 +11,7 @@ public abstract class EventBlock : Block
 {
      protected EventBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData) { }
 
-     public abstract Task<Result> TriggerAsync(IContext context, TurnScope? scope, Command command, GameModule? gameModule);
+     public abstract Task<Result> TriggerAsync(IContext context, TurnScope scope, Command command, GameModule? gameModule);
 }
 
 public abstract class EventBlock<TCommand> : EventBlock

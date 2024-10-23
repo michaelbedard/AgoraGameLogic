@@ -82,7 +82,7 @@ public class GameLogic
         }
 
         // log
-        Console.WriteLine(_gameData.GlobalContext.ToString());
+        // Console.WriteLine(_gameData.GlobalContext.ToString());
 
         return "";
     }

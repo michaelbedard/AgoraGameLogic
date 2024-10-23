@@ -142,10 +142,7 @@ public abstract class StatementBlock : Block
     
     public void ResetCompletionSource(string key)
     {
-        if (_completionSourceByKey.ContainsKey(key))
-        {
-            _completionSourceByKey[key] = new TaskCompletionSource<bool>();
-        }
+        _completionSourceByKey[key] = new TaskCompletionSource<bool>();
     }
 
     #endregion

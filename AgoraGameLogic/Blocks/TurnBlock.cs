@@ -54,7 +54,8 @@ public abstract class TurnBlock : StatementBlock
                 : 1;
             
             _numberOfActionByPlayer[player] = 0;
-        
+            ResetCompletionSource(player.Id);
+            
             while (_numberOfActionByPlayer[player] < numberOfAllowedAction)
             {
                 // remove previous update command for this player
@@ -128,9 +129,25 @@ public abstract class TurnBlock : StatementBlock
     /// </summary>
     #region Methods
 
-    public Result EndCurrentTurn(GameModule gameModule)
+    public Result EndCurrentTurn(GameModule player)
     {
-        return EndCurrentTurnCore(gameModule);
+        return EndCurrentTurnCore(player);
+    }
+
+    public Result ResumeCurrentTurn(GameModule player)
+    {
+        ValidateCompletionSource(player.Id);
+        return Result.Success();
+    }
+    
+    public Result ResumeAllPlayerCurrentTurn()
+    {
+        foreach (var player in Players)
+        {
+            ValidateCompletionSource(player.Id);
+        }
+        
+        return Result.Success();
     }
 
     public Result RegisterActionCount(GameModule player)
@@ -143,7 +160,6 @@ public abstract class TurnBlock : StatementBlock
             }
 
             _numberOfActionByPlayer[player]++;
-            ValidateCompletionSource(player.Id);
 
             return Result.Success();
         }

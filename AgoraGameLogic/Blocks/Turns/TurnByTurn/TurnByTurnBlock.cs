@@ -9,7 +9,7 @@ namespace AgoraGameLogic.Blocks.Turns;
 
 public class TurnByTurnBlock : TurnBlock
 {
-    private Task<Result> _executePlayerTurnTask;
+    private Dictionary<GameModule, Task<Result>> _executeTurnTaskByPlayer = new Dictionary<GameModule, Task<Result>>();
     private int _currentPlayerIndex = 0;
     private bool _isClockwise = true;
     
@@ -39,8 +39,11 @@ public class TurnByTurnBlock : TurnBlock
             while (currentTurn < maxNumberOfTurns && exitCondition.GetValueOrThrow(Context))
             {
                 // execute player turn
-                _executePlayerTurnTask = ExecutePlayerTurn(Context);
-                var playerTurnResult = await _executePlayerTurnTask;
+                var currentPlayer = GetNextPlayer();
+                _executeTurnTaskByPlayer[currentPlayer] = ExecutePlayerTurn(Context, currentPlayer);
+                
+                // await task
+                var playerTurnResult = await _executeTurnTaskByPlayer[currentPlayer];
                 if (!playerTurnResult.IsSuccess)
                 {
                     return Result.Failure(playerTurnResult.Error);
@@ -62,18 +65,19 @@ public class TurnByTurnBlock : TurnBlock
     {
         try
         {
-            while (!_executePlayerTurnTask.IsCompleted)
+            ResumeCurrentTurn(player);
+                
+            while (!_executeTurnTaskByPlayer[player].IsCompleted)
             {
-                // resolve inputs
+                // force inputs
                 var currentPlayer = Players[_currentPlayerIndex];
                 while (InputService.HasUnresolvedInputs(currentPlayer))
                 {
                     InputService.ResolveNextInput(currentPlayer);
                 }
                 
-                // perform an action
-                // TODO ActionService.PerformDefaultActionAsync(null, null, null);
-                throw new NotImplementedException();
+                // force an action
+                ActionService.ForcePerformActionAsync(player.Id);
             }
 
             return Result.Success();
@@ -137,25 +141,24 @@ public class TurnByTurnBlock : TurnBlock
         return Players[_currentPlayerIndex];
     }
     
-    private async Task<Result> ExecutePlayerTurn(IContext context)
+    private async Task<Result> ExecutePlayerTurn(IContext context, GameModule player)
     {
-        var currentPlayer = GetNextPlayer();
-        context.AddOrUpdate("player", ref currentPlayer);
+        context.AddOrUpdate("player", ref player);
         
         // start, update, end
-        var startResult = await ExecuteStart(context, currentPlayer);
+        var startResult = await ExecuteStart(context, player);
         if (!startResult.IsSuccess)
         {
             return Result.Failure(startResult.Error);
         }
         
-        var updateResult = await ExecuteUpdate(context, currentPlayer);
+        var updateResult = await ExecuteUpdate(context, player);
         if (!updateResult.IsSuccess)
         {
             return Result.Failure(updateResult.Error);
         }
                 
-        var endResult = await ExecuteEnd(context, currentPlayer);
+        var endResult = await ExecuteEnd(context, player);
         if (!endResult.IsSuccess)
         {
             return Result.Failure(endResult.Error);

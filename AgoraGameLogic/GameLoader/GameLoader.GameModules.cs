@@ -61,12 +61,15 @@ public partial class GameLoader
         return GameLoaderUtility.GetNamesForGameModuleOrThrow(extendedName, gameModuleBuildData, numberOfPlayers).ToArray();
     }
 
-    private GameModule CreateGameModule(
-        string name, 
-        GameModuleBuildData gameModuleBuildData, 
-        List<StructureBuildData> structureHierarchy) =>
-        new GameModule(name, gameModuleBuildData.Name, gameModuleBuildData.Type, 
-                       structureHierarchy.Select(s => s.Name).ToArray());
+    private GameModule CreateGameModule(string name, GameModuleBuildData gameModuleBuildData,
+        List<StructureBuildData> structureHierarchy)
+    {
+        return new GameModule(
+            name,
+            gameModuleBuildData.Name,
+            gameModuleBuildData.Type,
+            structureHierarchy.Select(s => s.Name).ToArray());
+    }
 
     private void HandleModuleType(
         GameModule gameModule, 
@@ -170,5 +173,8 @@ public partial class GameLoader
             var value = field.Value;
             gameModule.Fields.AddOrUpdate(field.Key, ref value);
         }
+
+        gameModule.Fields.AddOrUpdate("Id", gameModule.Id);
+        gameModule.Fields.AddOrUpdate("Type", gameModule.Type.ToString());
     }
 }

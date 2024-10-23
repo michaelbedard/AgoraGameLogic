@@ -35,6 +35,12 @@ public abstract class ActionCommand<TCommand, TBlock, TEvent> : ActionCommand
     /// </summary>
     public override async Task<Result> PerformAsync(bool shouldRegisterAction)
     {
+        if (shouldRegisterAction && Scope != null)
+        {
+            // register action
+            Scope.TurnBlock.RegisterActionCount(Target);
+        }
+        
         // perform
         var performResult = Perform();
         if (!performResult.IsSuccess)
@@ -48,11 +54,11 @@ public abstract class ActionCommand<TCommand, TBlock, TEvent> : ActionCommand
         {
             return Result.Failure($"Error while triggering events for {typeof(TCommand).Name}: {triggerEventResult.Error}");
         }
-
-        // check if shouldRegisterAction
-        if (shouldRegisterAction && Scope != null)
+        
+        if (Scope != null)
         {
-            Scope.TurnBlock.RegisterActionCount(Target);
+            // resume every player current turn.  This effectively trigger update for all
+            Scope.TurnBlock.ResumeAllPlayerCurrentTurn();
         }
     
         return Result.Success();
