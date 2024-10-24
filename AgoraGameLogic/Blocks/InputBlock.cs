@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Blocks;
 using AgoraGameLogic.Utility.BuildData;
 using AgoraGameLogic.Utility.Commands;
 
@@ -17,7 +18,7 @@ public abstract class InputBlock : StatementBlock
 public abstract class InputBlock<TCommand, TBlock, TEvent> : InputBlock
     where TCommand : InputCommand<TCommand, TBlock, TEvent>
     where TBlock : InputBlock<TCommand, TBlock, TEvent>
-    where TEvent : EventBlock
+    where TEvent : IEventBlock
 {
     protected InputBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {

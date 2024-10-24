@@ -3,6 +3,7 @@ using System.Linq;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks;
 using AgoraGameLogic.Factories;
+using AgoraGameLogic.Interfaces.Blocks;
 using AgoraGameLogic.Utility.BuildData;
 
 namespace AgoraGameLogic.GameLoader;
@@ -71,7 +72,7 @@ public partial class GameLoader
                 return Result.Failure(blockResult.Error);
             }
 
-            if (blockResult.Value is EventBlock eventBlock)
+            if (blockResult.Value is IEventBlock eventBlock)
             {
                 gameData.EventService.RegisterGlobalEvent(eventBlock);
             }
@@ -97,7 +98,7 @@ public partial class GameLoader
                 }
 
 
-                if (blockResult.Value is EventBlock eventBlock)
+                if (blockResult.Value is IEventBlock eventBlock)
                 {
                     gameData.EventService.RegisterModuleEvent(entry.Key, eventBlock);
                 }

@@ -1,6 +1,7 @@
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks;
 using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Blocks;
 using AgoraGameLogic.Interfaces.Services;
 using AgoraGameLogic.Utility.Commands;
 
@@ -22,7 +23,7 @@ public class EventService : IEventService
     /// <summary>
     /// Registers an event block for a specific game module.
     /// </summary>
-    public Result RegisterModuleEvent(GameModule gameModule, EventBlock eventBlock)
+    public Result RegisterModuleEvent(GameModule gameModule, IEventBlock eventBlock)
     {
         try
         {
@@ -47,7 +48,7 @@ public class EventService : IEventService
     /// <summary>
     /// Registers a global event block.
     /// </summary>
-    public Result RegisterGlobalEvent(EventBlock eventBlock)
+    public Result RegisterGlobalEvent(IEventBlock eventBlock)
     {
         try
         {
@@ -67,7 +68,7 @@ public class EventService : IEventService
     /// <summary>
     /// Triggers events asynchronously and returns a Result.
     /// </summary>
-    public async Task<Result> TriggerEventsAsync<T>(TurnScope? scope, Command command) where T : EventBlock
+    public async Task<Result> TriggerEventsAsync<T>(TurnScope? scope, Command command) where T : IEventBlock
     {
         try
         {
@@ -111,31 +112,31 @@ public class EventService : IEventService
     /// </summary>
     private class EventStore
     {
-        private readonly Dictionary<Type, List<EventBlock>> _eventsByType;
+        private readonly Dictionary<Type, List<IEventBlock>> _eventsByType;
 
         public EventStore()
         {
-            _eventsByType = new Dictionary<Type, List<EventBlock>>();
+            _eventsByType = new Dictionary<Type, List<IEventBlock>>();
         }
 
-        public void AddEvent(Type eventType, EventBlock eventBlock)
+        public void AddEvent(Type eventType, IEventBlock eventBlock)
         {
             if (!_eventsByType.ContainsKey(eventType))
             {
-                _eventsByType[eventType] = new List<EventBlock>();
+                _eventsByType[eventType] = new List<IEventBlock>();
             }
 
             _eventsByType[eventType].Add(eventBlock);
         }
 
-        public List<EventBlock> GetEvents(Type eventType)
+        public List<IEventBlock> GetEvents(Type eventType)
         {
             if (_eventsByType.TryGetValue(eventType, out var eventBlocks))
             {
                 return eventBlocks;
             }
 
-            return new List<EventBlock>();
+            return new List<IEventBlock>();
         }
     }
 }

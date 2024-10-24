@@ -13,6 +13,7 @@ public class GameData
     
     public IEventService EventService = new EventService();
     public IActionService ActionService = new ActionService();
+    public IBlockService BlockService = new BlockService();
     public IInputService InputService = new InputService();
     public ExecutionService ExecutionService = new ExecutionService();
     public AnimationService AnimationService = new AnimationService();

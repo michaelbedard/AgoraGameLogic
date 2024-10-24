@@ -2,6 +2,7 @@ using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks;
 using AgoraGameLogic.Dtos;
 using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Blocks;
 
 namespace AgoraGameLogic.Utility.Commands;
 
@@ -13,7 +14,7 @@ public abstract class ActionCommand : Command
 public abstract class ActionCommand<TCommand, TBlock, TEvent> : ActionCommand
     where TCommand : ActionCommand<TCommand, TBlock, TEvent>
     where TBlock : ActionBlock<TCommand, TBlock, TEvent>
-    where TEvent : EventBlock
+    where TEvent : IEventBlock
 {
     public TBlock ActionBlock;
 

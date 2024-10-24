@@ -1,4 +1,5 @@
 using AgoraGameLogic.Actors;
+using AgoraGameLogic.Interfaces.Blocks;
 using AgoraGameLogic.Utility.BuildData;
 using AgoraGameLogic.Utility.Commands;
 using AgoraGameLogic.Utility.Enums;
@@ -15,7 +16,7 @@ public abstract class ActionBlock : StatementBlock
 public abstract class ActionBlock<TCommand, TBlock, TEvent> : ActionBlock
     where TCommand : ActionCommand<TCommand, TBlock, TEvent>
     where TBlock : ActionBlock<TCommand, TBlock, TEvent>
-    where TEvent : EventBlock
+    where TEvent : IEventBlock
 {
     protected Value<ActionBehavior> BehaviorValue;
     protected ActionBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)

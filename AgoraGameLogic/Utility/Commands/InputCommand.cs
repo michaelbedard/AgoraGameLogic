@@ -2,6 +2,7 @@ using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks;
 using AgoraGameLogic.Dtos;
 using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Blocks;
 
 namespace AgoraGameLogic.Utility.Commands;
 
@@ -14,7 +15,7 @@ public abstract class InputCommand : Command
 public abstract class InputCommand<TCommand, TBlock, TEvent> : InputCommand
     where TCommand : InputCommand<TCommand, TBlock, TEvent>
     where TBlock : InputBlock<TCommand, TBlock, TEvent>
-    where TEvent : EventBlock
+    where TEvent : IEventBlock
 {
     public TBlock InputBlock;
     public TurnScope Scope;

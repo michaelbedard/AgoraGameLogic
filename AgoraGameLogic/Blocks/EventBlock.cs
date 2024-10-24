@@ -1,33 +1,23 @@
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks.Options;
 using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Blocks;
 using AgoraGameLogic.Utility.BuildData;
 using AgoraGameLogic.Utility.Commands;
-using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks;
 
-public abstract class EventBlock : Block
-{
-     protected EventBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData) { }
-
-     public abstract Task<Result> TriggerAsync(IContext context, TurnScope scope, Command command, GameModule? gameModule);
-}
-
-public abstract class EventBlock<TCommand> : EventBlock
+public abstract class EventBlock<TCommand> : Block, IEventBlock
      where TCommand : Command
 {
      protected StatementBlock[] Blocks;
      
-     protected EventBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
-     {
-          BlockType = BlockType.FunctionBlock;
-     }
+     protected EventBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData) { }
      
      protected abstract Task<Result> TriggerAsyncCore(TCommand command);
 
      // wrapper function
-     public override async Task<Result> TriggerAsync(IContext context, TurnScope scope, Command command, GameModule? gameModule)
+     public async Task<Result> TriggerAsync(IContext context, TurnScope scope, Command command, GameModule? gameModule)
      {
           try
           {
@@ -54,9 +44,8 @@ public abstract class EventBlock<TCommand> : EventBlock
                     return await TriggerAsyncCore(specificCommand);
                }
 
-               return Result.Failure($"Called {nameof(TriggerAsync)} with invalid command type.  Expected {typeof(TCommand)} but got {command.Type}", new ErrorBuilder()
+               return Result.Failure($"Called {nameof(TriggerAsync)} with invalid command type.  Expected {typeof(TCommand).Name} but got {command.Type}", new ErrorBuilder()
                {
-                    ClassName = nameof(EventBlock),
                     MethodName = nameof(TriggerAsync),
                     GameModule = gameModule,
                     Scope = Scope,
@@ -66,7 +55,6 @@ public abstract class EventBlock<TCommand> : EventBlock
           {
                return Result.Failure($"Unexpected Errors: {e.Message}", new ErrorBuilder()
                {
-                    ClassName = nameof(EventBlock),
                     MethodName = nameof(TriggerAsync),
                     GameModule = gameModule,
                     Scope = Scope,

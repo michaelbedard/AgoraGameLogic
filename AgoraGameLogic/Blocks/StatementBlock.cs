@@ -1,9 +1,9 @@
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Interfaces.Actors;
+using AgoraGameLogic.Interfaces.Blocks;
 using AgoraGameLogic.Interfaces.Other;
 using AgoraGameLogic.Utility.BuildData;
 using AgoraGameLogic.Utility.Commands;
-using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks;
 
@@ -12,17 +12,13 @@ namespace AgoraGameLogic.Blocks;
 /// Statement blocks can trigger animations and events
 /// 
 /// </summary>
-public abstract class StatementBlock : Block
+public abstract class StatementBlock : Block, IStatementBlock
 {
-    private TaskCompletionSource<bool> _completionSource;
-    private Dictionary<string, TaskCompletionSource<bool>> _completionSourceByKey;
+    private TaskCompletionSource<bool> _completionSource = new TaskCompletionSource<bool>();
+    private Dictionary<string, TaskCompletionSource<bool>> _completionSourceByKey = new Dictionary<string, TaskCompletionSource<bool>>();
     
     protected StatementBlock(BlockBuildData buildData, GameData gameData) : base(buildData, gameData)
     {
-        BlockType = BlockType.StatementBlock;
-        
-        _completionSource = new TaskCompletionSource<bool>();
-        _completionSourceByKey = new Dictionary<string, TaskCompletionSource<bool>>();
     }
     
     // ABSTRACT
@@ -46,7 +42,7 @@ public abstract class StatementBlock : Block
     
     #region EVENTS
 
-    public async Task<Result> TriggerEventsAsync<T>(Command command) where T : EventBlock
+    public async Task<Result> TriggerEventsAsync<T>(Command command) where T : IEventBlock
     {
         return await EventService.TriggerEventsAsync<T>(Scope, command);
     }

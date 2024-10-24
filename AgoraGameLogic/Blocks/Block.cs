@@ -2,8 +2,8 @@ using AgoraGameLogic.Actors;
 using AgoraGameLogic.Factories;
 using AgoraGameLogic.Interfaces.Actors;
 using AgoraGameLogic.Interfaces.Services;
+using AgoraGameLogic.Services;
 using AgoraGameLogic.Utility.BuildData;
-using AgoraGameLogic.Utility.Enums;
 
 namespace AgoraGameLogic.Blocks;
 
@@ -11,12 +11,12 @@ public abstract class Block
 {
     protected IActionService ActionService;
     protected IAnimationService AnimationService;
+    protected IBlockService BlockService;
     protected IEventService EventService;
     protected IExecutionService ExecutionService;
     protected IInputService InputService;
     protected IScoringService ScoringService;
     
-    protected BlockType BlockType;
     protected OptionBlock[] Options;
     protected List<GameModule> Players;
 
@@ -27,6 +27,7 @@ public abstract class Block
     {
         ActionService = gameData.ActionService;
         AnimationService = gameData.AnimationService;
+        BlockService = gameData.BlockService;
         EventService = gameData.EventService;
         ExecutionService = gameData.ExecutionService;
         InputService = gameData.InputService;
