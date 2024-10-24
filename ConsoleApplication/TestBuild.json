@@ -65,7 +65,7 @@
         ".  Enjoy!"
       ],
       "Fields" : [
-        {"Key" : "Color", "Value" : "blue"}
+        {"Key" : "CardsToDraw", "Value" : "0"}
       ],
       "Blocks" : [
 //        {"Type": "OnStartGameBlock", "Options": [
@@ -114,6 +114,18 @@
     {"Key": "AList", "Value" : [0, 1, 2, 3]}
   ],
   "GlobalBlocks" : [
+    // Define TestBlock
+    {"Type": "DefineConditionBlockBlock", "Inputs": ["TestBlock", 
+      [
+        {"SegmentType" : "Text", "SegmentLabel" : "Can "},
+        {"SegmentType" : "Value", "SegmentLabel" : "player"},
+        {"SegmentType" : "Text", "SegmentLabel" : " play his turn?"},
+      ], 
+      {"Type": "EqualsBlock", "Inputs": [
+        {"Type": "ContextValueBlock", "Inputs" : ["player", ["CardsToDraw"]]}, 0
+      ]}
+    ]},
+    // Start Game
     {"Type": "OnStartGameBlock", "Inputs": [
       [
         {"Type": "IfBlock", "Inputs": [
@@ -126,27 +138,31 @@
           {"Type": "NumberOfActionTurnOption", "Inputs" : [2]}
         ], "Inputs" : [
           [
-            // start branch
+            // Start branch
             {"Type": "LogBlock", "Inputs": ["START for ", {"Type": "ContextValueBlock", "Inputs" : ["player", ["Id"]]}]},
+            {"Type": "LogBlock", "Inputs": ["TestBlock result ",
+              {"Type": "CustomBlock", "Inputs" : ["TestBlock", [{"Type": "ContextValueBlock", "Inputs" : ["player"]}]]}
+            ]},
+            // allow draw 3x
             {"Type": "DrawCardBlock", "Inputs": ["Allow",
-              {"Type": "ContextValueBlock", "Inputs" : ["player"]}, // current player
+              {"Type": "ContextValueBlock", "Inputs" : ["player"]},
               {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
             ]},
             {"Type": "DrawCardBlock", "Inputs": ["Allow",
-              {"Type": "ContextValueBlock", "Inputs" : ["player"]}, // current player
+              {"Type": "ContextValueBlock", "Inputs" : ["player"]},
               {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
             ]},
             {"Type": "DrawCardBlock", "Inputs": ["Allow",
-              {"Type": "ContextValueBlock", "Inputs" : ["player"]}, // current player
+              {"Type": "ContextValueBlock", "Inputs" : ["player"]},
               {"Type": "ContextValueBlock", "Inputs" : ["DrawingDeck"]}
             ]}
           ], 
           [
-            // update branch
+            // Update branch
             {"Type": "LogBlock", "Inputs": ["UPDATE for ", {"Type": "ContextValueBlock", "Inputs" : ["player", ["Id"]]}]}
           ], 
           [
-            // end branch
+            // End branch
             {"Type": "LogBlock", "Inputs": ["END for ", {"Type": "ContextValueBlock", "Inputs" : ["player", ["Id"]]}]}
           ]
         ]}

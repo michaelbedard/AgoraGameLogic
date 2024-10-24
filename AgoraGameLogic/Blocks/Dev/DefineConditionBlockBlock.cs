@@ -1,6 +1,8 @@
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Factories;
 using AgoraGameLogic.Utility.BuildData;
+using AgoraGameLogic.Utility.Extensions;
+using Newtonsoft.Json.Linq;
 
 namespace AgoraGameLogic.Blocks.Dev;
 
@@ -13,17 +15,19 @@ namespace AgoraGameLogic.Blocks.Dev;
 public class DefineConditionBlockBlock : StatementBlock
 {
     private string _customBlockType;
+    private JArray _customBlockDefinition;
     private Block _customBlock;
     
     public DefineConditionBlockBlock(BlockBuildData buildData, GameData gameData) : base (buildData, gameData)
     {
         _customBlockType = buildData.Inputs[0].ToString();
-        _customBlock = BlockFactory.CreateOrThrow<Block>(buildData.Inputs[1], gameData);
+        _customBlockDefinition = buildData.Inputs[1].AsValidArray();
+        _customBlock = BlockFactory.CreateOrThrow<Block>(buildData.Inputs[2], gameData);
     }
 
     // register block
     protected override async Task<Result> ExecuteAsyncCore()
     {
-        return BlockService.RegisterCustomBlock(_customBlockType, _customBlock);
+        return BlockService.RegisterCustomBlock(_customBlockType, _customBlockDefinition, _customBlock);
     }
 }

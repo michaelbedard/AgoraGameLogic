@@ -13,5 +13,5 @@ public interface IEventService
     void SetGlobalContext(IContext context);
     Result RegisterModuleEvent(GameModule gameModule, IEventBlock eventBlock);
     Result RegisterGlobalEvent(IEventBlock eventBlock);
-    Task<Result> TriggerEventsAsync<T>(TurnScope turnScope, Command command) where T : IEventBlock;
+    Task<Result> TriggerEventsAsync<T>(TurnScope? turnScope, Command command) where T : IEventBlock;
 }

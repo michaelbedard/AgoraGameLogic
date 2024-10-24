@@ -16,6 +16,7 @@ using AgoraGameLogic.Blocks.Options;
 using AgoraGameLogic.Blocks.Options.TurnOptions;
 using AgoraGameLogic.Blocks.Turns;
 using AgoraGameLogic.Blocks.Values;
+using AgoraGameLogic.Services;
 using AgoraGameLogic.Utility.BuildData;
 using Newtonsoft.Json.Linq;
 
@@ -169,7 +170,7 @@ public class BlockFactory
             else
             {
                 return Result<T>.Failure(
-                    $"Invalid cast: Expected a block of type {typeof(T).Name} but got {blockResult.GetType().Name}."
+                    $"Invalid cast: Expected a block of type {typeof(T).Name} but got {blockResult.Value.GetType()}."
                 );
             }
         }
@@ -205,6 +206,8 @@ public class BlockFactory
             {
                 // Dev
                 nameof(LogBlock) => new LogBlock(blockBuildData, gameData),
+                nameof(CustomBlock) => new CustomBlock(blockBuildData, gameData),
+                nameof(DefineConditionBlockBlock) => new DefineConditionBlockBlock(blockBuildData, gameData),
 
                 // Options
                 nameof(OnlyTriggerIfTargetedBlock) => new OnlyTriggerIfTargetedBlock(blockBuildData, gameData),
@@ -262,7 +265,7 @@ public class BlockFactory
         }
         catch (Exception e)
         {
-            return Result<Block>.Failure($"Exception occurred while creating block: {e.Message}");
+            return Result<Block>.Failure($"{blockBuildData.Type} : {e.Message}");
         }
     }
 }

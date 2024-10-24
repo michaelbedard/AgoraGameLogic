@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AgoraGameLogic.Actors;
 using AgoraGameLogic.Blocks;
+using AgoraGameLogic.Blocks.Dev;
 using AgoraGameLogic.Factories;
 using AgoraGameLogic.Interfaces.Blocks;
 using AgoraGameLogic.Utility.BuildData;
@@ -62,7 +63,7 @@ public partial class GameLoader
         return Result.Success();
     }
 
-    public Result LoadGlobalEvents(BlockBuildData[] globalBlockDefinitions, GameData gameData)
+    public Result LoadGlobalBlocks(BlockBuildData[] globalBlockDefinitions, GameData gameData)
     {
         foreach (var globalBlockDefinition in globalBlockDefinitions)
         {
@@ -72,9 +73,22 @@ public partial class GameLoader
                 return Result.Failure(blockResult.Error);
             }
 
+            // register events
             if (blockResult.Value is IEventBlock eventBlock)
             {
                 gameData.EventService.RegisterGlobalEvent(eventBlock);
+            }
+            
+            // register custom statement block definition
+            if (blockResult.Value is DefineStatementBlockBlock customStatementBlock)
+            {
+                gameData.BlockService.RegisterDefinitionBlock(customStatementBlock);
+            }
+            
+            // register custom condition block definition
+            if (blockResult.Value is DefineConditionBlockBlock customConditionBlock)
+            {
+                gameData.BlockService.RegisterDefinitionBlock(customConditionBlock);
             }
         }
         

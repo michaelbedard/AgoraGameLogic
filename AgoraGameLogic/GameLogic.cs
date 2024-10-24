@@ -59,7 +59,7 @@ public class GameLogic
         var loadResult = gameLoader.LoadDescriptions(gameModulesToBuildData, gameBuildData.Structures, _gameData)
             .Then(() => gameLoader.LoadGameModuleEvents(gameModulesToBuildData, gameBuildData.Structures, _gameData))
             .Then(() => gameLoader.LoadGlobalVariables(gameBuildData.GlobalVariables, _gameData))
-            .Then(() => gameLoader.LoadGlobalEvents(gameBuildData.GlobalBlocks, _gameData))
+            .Then(() => gameLoader.LoadGlobalBlocks(gameBuildData.GlobalBlocks, _gameData))
             .Then(() => gameLoader.LoadScoringRules(gameBuildData.ScoringRules, _gameData));
         if (!loadResult.IsSuccess)
         {
@@ -91,10 +91,22 @@ public class GameLogic
     {
         _gameData.GameIsRunning = true;
         
-        // perform action
-        var task = _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(null, new StartGameCommand());
-
-        task.ContinueWith(t =>
+        // call all custom definiton block
+        foreach (var customBlockDefinitionBlock in _gameData.BlockService.GetRegisterDefinitionBlocks())
+        {
+            var definitionTask = customBlockDefinitionBlock.ExecuteAsync(_gameData.GlobalContext.Copy(), null);
+            definitionTask.ContinueWith(t =>
+            {
+                if (t.Result != null && !t.Result.IsSuccess)
+                {
+                    Console.WriteLine($"[Custom block definition failed] {t.Result.Error}");
+                }
+            });
+        }
+        
+        // trigger start game with empty command
+        var startGameTask = _gameData.EventService.TriggerEventsAsync<OnStartGameBlock>(null, new StartGameCommand());
+        startGameTask.ContinueWith(t =>
         {
             if (t.Result != null && !t.Result.IsSuccess)
             {
